@@ -1,0 +1,87 @@
+---
+config:
+  theme: dark
+  layout: elk
+---
+classDiagram
+direction TB
+class Account {
+  - accountNumber: String
+  - name: String
+  - email: String
+  - passwordHash: String
+  - balance: double
+  - wallet: Map<String,Double>
+  + deposit(double)
+  + withdraw(double): boolean
+  + addAsset(String,double)
+  + removeAsset(String,double)
+}
+class Asset {
+  - symbol: String
+  - name: String
+  - currentValue: double
+  - description: String
+}
+class Operation {
+  - accountNumber: String
+  - assetSymbol: String
+  - amount: double
+  - price: double
+  - date: LocalDateTime
+  - type: Type
+}
+class Transfer {
+  - fromAccount: String
+  - toAccount: String
+  - assetSymbol: String
+  - amount: double
+  - date: LocalDateTime
+}
+class AuthService {
+  - accounts: Map<String,Account>
+  + register(Account)
+  + login(String,String): Account
+  + getAccounts(): Map<String,Account>
+}
+class TwoFactorService {
+  + generateAndSendCode(String)
+  + validateCode(String): boolean
+}
+class AssetService {
+  - assets: Map<String,Asset>
+  + getAssets(): Map<String,Asset>
+  + updateAssetValue(Asset)
+}
+class OperationService {
+  - operations: List<Operation>
+  + buyAsset(Account,Asset,double): boolean
+  + sellAsset(Account,Asset,double): boolean
+  + listByAccount(String): List<Operation>
+}
+class TransferService {
+  - allTransfers: List<Transfer>
+  + transfer(Account,Account,String,double): boolean
+  + deposit(Account,double): boolean
+  + withdraw(Account,double): boolean
+  + listByUser(String): List<Transfer>
+}
+class ReportService {
+  + printReport(String,List<Operation>,double,Map<String,Double>,List<Transfer>)
+}
+AuthService "1" o-- "many" Account : cadastro
+AuthService --> TwoFactorService : 2FA
+Account "1" -- "many" Operation : registra
+Account "1" -- "many" Transfer : envia/recebe
+AssetService "1" o-- "many" Asset : catálogo
+OperationService "1" o-- "many" Operation : histórico
+TransferService "1" o-- "many" Transfer : histórico
+OperationService --> Account : movimentação
+OperationService --> Asset : cotação
+TransferService --> Account : movimentação
+ReportService --> Account
+ReportService --> Operation
+ReportService --> Transfer
+note for Account "Conta acumula saldo, múltiplos ativos e registra histórico."
+note for OperationService "Centraliza regra de negócio de compra e venda."
+note for TransferService "Toda transação entre contas (saque, depósito, transferência) via TransferService."
