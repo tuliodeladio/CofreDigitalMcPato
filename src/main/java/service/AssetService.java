@@ -1,9 +1,9 @@
-package Services;
+package service;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import Models.Asset;
+import model.Asset;
 
 public class AssetService {
     private final Random random = new Random();

@@ -1,10 +1,10 @@
-package Services;
+package service;
 
 import java.util.ArrayList;
 import java.util.List;
-import Models.Account;
-import Models.Asset;
-import Models.Operation;
+import model.Account;
+import model.Asset;
+import model.Operation;
 
 public class OperationService {
     private final List<Operation> operations = new ArrayList<>();

@@ -1,11 +1,11 @@
-package Services;
+package service;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import Models.Operation;
-import Models.Transfer;
+import model.Operation;
+import model.Transfer;
 
 public class ReportService {
     public void printReport(String accountNumber, List<Operation> operations, double saldoFinal, Map<String, Double> wallet, List<Transfer> transfers) {

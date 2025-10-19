@@ -1,9 +1,9 @@
-package Services;
+package service;
 
 import java.util.ArrayList;
 import java.util.List;
-import Models.Account;
-import Models.Transfer;
+import model.Account;
+import model.Transfer;
 
 public class TransferService {
     private List<Transfer> allTransfers = new ArrayList<>();

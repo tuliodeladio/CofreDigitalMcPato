@@ -1,4 +1,4 @@
-package Models;
+package model;
 
 public class Asset {
     private final String symbol;

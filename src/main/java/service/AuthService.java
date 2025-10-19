@@ -1,9 +1,9 @@
-package Services;
+package service;
 
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
-import Models.Account;
+import model.Account;
 
 public class AuthService {
     private final Map<String, Account> accounts = new HashMap<>();

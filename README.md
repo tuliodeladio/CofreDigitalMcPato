@@ -24,12 +24,12 @@ Este sistema foi criado como atividade e laboratório prático para a turma de E
 ## 🛠 Estrutura dos Arquivos
 
 src/main/java/<br>
-├── Models/<br>
+├── model/<br>
 │   ├── Account.java<br>
 │   ├── Asset.java<br>
 │   ├── Operation.java<br>
 │   └── Transfer.java<br>
-├── Services/<br>
+├── service/<br>
 │   ├── AuthService.java<br>
 │   ├── AssetService.java<br>
 │   ├── OperationService.java<br>
