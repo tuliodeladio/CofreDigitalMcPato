@@ -29,7 +29,7 @@ public class TransferService {
             return false;
         }
         to.deposit(amount);
-        Transfer deposit = new Transfer("BANK", to.getAccountNumber(), "BRL", amount);
+        Transfer deposit = new Transfer(to.getAccountNumber(), amount, "PIX");
         allTransfers.add(deposit);
         System.out.println("Depósito realizado.");
         return true;
@@ -42,7 +42,7 @@ public class TransferService {
             return false;
         }
         if (from.withdraw(amount)) {
-            Transfer saque = new Transfer(from.getAccountNumber(), "CASH", "BRL", amount);
+            Transfer saque = new Transfer(from.getAccountNumber(), amount);
             allTransfers.add(saque);
             System.out.println("Saque realizado.");
             return true;

@@ -1,0 +1,53 @@
+---
+config:
+  layout: elk
+---
+classDiagram
+direction LR
+    class Account {
+	    + accountNumber: String *PK*
+	    - name: String
+	    - email: String
+	    - passwordHash: String
+	    - balance: double
+	    - wallet: Map
+	    + deposit(double)
+	    + withdraw(double) : boolean
+	    + addAsset(String,double)
+	    + removeAsset(String,double)
+    }
+    class AccountPessoaFisica{
+	    + cpf: String
+    }
+    class AccountEmpresa {
+	    + cnpj: String
+    }
+    class Asset {
+	    + symbol: String *PK*
+	    - name: String
+	    - currentValue: double
+	    - description: String
+    }
+    class Operation {
+	    + id: int *PK*
+	    - accountNumber: String #FK Account#
+	    - assetSymbol: String #FK Asset#
+	    - amount: double
+	    - price: double
+	    - date: LocalDateTime
+	    - type: Type
+    }
+    class Transfer {
+	    + id: int *PK*
+	    - fromAccount: String #FK Account#
+	    - toAccount: String #FK Account#
+	    - assetSymbol: String #FK Asset#
+	    - amount: double
+	    - date: LocalDateTime
+    }
+    AccountPessoaFisica --|> Account
+    AccountEmpresa --|> Account
+    Account "1" o-- "many" Operation : registra
+    Asset "1" o-- "many" Operation : movimenta
+    Account "1" o-- "many" Transfer : origem/destino
+    Asset "1" o-- "many" Transfer : referencia
