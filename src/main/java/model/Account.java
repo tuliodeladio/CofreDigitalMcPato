@@ -33,23 +33,15 @@ public abstract class Account {
         return true;
     }
 
-    public Map<String, Double> getWallet() {
-        return wallet;
-    }
-
-    public double getAsset(String symbol) {
-        return wallet.getOrDefault(symbol, 0.0);
-    }
-
+    public Map<String, Double> getWallet() { return wallet; }
+    public double getAsset(String symbol) { return wallet.getOrDefault(symbol, 0.0); }
     public void addAsset(String symbol, double quantity) {
         wallet.put(symbol, wallet.getOrDefault(symbol, 0.0) + quantity);
     }
-
     public void removeAsset(String symbol, double quantity) {
         double qtdAtual = wallet.getOrDefault(symbol, 0.0);
         if (qtdAtual >= quantity) {
             wallet.put(symbol, qtdAtual - quantity);
         }
     }
-
 }

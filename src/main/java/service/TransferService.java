@@ -1,64 +1,91 @@
 package service;
 
-import java.util.ArrayList;
-import java.util.List;
 import model.Account;
 import model.Transfer;
 
+import java.time.LocalDateTime;
+import java.util.*;
+
 public class TransferService {
-    private List<Transfer> allTransfers = new ArrayList<>();
 
-    // Transferência entre contas
-    public boolean transfer(Account from, Account to, String assetSymbol, double quantity) {
-        if (from.getAsset(assetSymbol) < quantity) {
-            System.out.println("Saldo insuficiente de " + assetSymbol + " para transferência.");
-            return false;
+    private static Map<String, List<Transfer>> transferenciasPorConta = new HashMap<>();
+
+    public Transfer withdraw(Account contaOrigem, double valor) {
+        if (!contaOrigem.withdraw(valor)) {
+            return null;
         }
-        from.removeAsset(assetSymbol, quantity);
-        to.addAsset(assetSymbol, quantity);
-        Transfer transfer = new Transfer(from.getAccountNumber(), to.getAccountNumber(), assetSymbol, quantity);
-        allTransfers.add(transfer);
-        System.out.println("Transferência realizada de " + quantity + " " + assetSymbol + " de " + from.getName() + " para " + to.getName() + "!");
-        return true;
+
+        Transfer transferencia = new Transfer(
+                System.currentTimeMillis(),
+                contaOrigem.getAccountNumber(),
+                null,
+                null,
+                null,
+                valor,
+                "SAQUE",
+                LocalDateTime.now()
+        );
+
+        adicionarTransferencia(contaOrigem.getAccountNumber(), transferencia);
+        return transferencia;
     }
 
-    // Depósito em BRL
-    public boolean deposit(Account to, double amount) {
-        if (amount <= 0) {
-            System.out.println("Valor inválido para depósito.");
-            return false;
+    public Transfer deposit(Account contaDestino, double valor) {
+        if (valor <= 0) {
+            return null;
         }
-        to.deposit(amount);
-        Transfer deposit = new Transfer(to.getAccountNumber(), amount, "PIX");
-        allTransfers.add(deposit);
-        System.out.println("Depósito realizado.");
-        return true;
+
+        contaDestino.deposit(valor);
+
+        Transfer transferencia = new Transfer(
+                System.currentTimeMillis(),
+                null,
+                contaDestino.getAccountNumber(),
+                null,
+                null,
+                valor,
+                "DEPOSITO",
+                LocalDateTime.now()
+        );
+
+        adicionarTransferencia(contaDestino.getAccountNumber(), transferencia);
+        return transferencia;
     }
 
-    // Saque em BRL
-    public boolean withdraw(Account from, double amount) {
-        if (amount <= 0) {
-            System.out.println("Valor inválido para saque.");
-            return false;
+    public Transfer transfer(Account contaOrigem, Account contaDestino,
+                             String symbol, double quantity) {
+
+        double qtdOrigem = contaOrigem.getAsset(symbol);
+        if (qtdOrigem < quantity) {
+            return null;
         }
-        if (from.withdraw(amount)) {
-            Transfer saque = new Transfer(from.getAccountNumber(), amount);
-            allTransfers.add(saque);
-            System.out.println("Saque realizado.");
-            return true;
-        } else {
-            System.out.println("Saldo insuficiente para saque.");
-            return false;
-        }
+
+        contaOrigem.removeAsset(symbol, quantity);
+        contaDestino.addAsset(symbol, quantity);
+
+        Transfer transferencia = new Transfer(
+                System.currentTimeMillis(),
+                contaOrigem.getAccountNumber(),
+                contaDestino.getAccountNumber(),
+                symbol,
+                quantity,
+                null,
+                "TRANSFER_ATIVO",
+                LocalDateTime.now()
+        );
+
+        adicionarTransferencia(contaOrigem.getAccountNumber(), transferencia);
+        adicionarTransferencia(contaDestino.getAccountNumber(), transferencia);
+        return transferencia;
     }
 
     public List<Transfer> listByUser(String accountNumber) {
-        List<Transfer> result = new ArrayList<>();
-        for (Transfer t : allTransfers) {
-            if (t.getFromAccount().equals(accountNumber) || t.getToAccount().equals(accountNumber)) {
-                result.add(t);
-            }
-        }
-        return result;
+        return transferenciasPorConta.getOrDefault(accountNumber, new ArrayList<>());
+    }
+
+    private void adicionarTransferencia(String accountNumber, Transfer transferencia) {
+        transferenciasPorConta
+                .computeIfAbsent(accountNumber, k -> new ArrayList<>())
+                .add(transferencia);
     }
 }

@@ -1,0 +1,68 @@
+---
+config:
+  layout: elk
+---
+classDiagram
+direction TB
+    class ACCOUNT {
+	    +CHAR(10) account_number
+	    +VARCHAR(100) name
+	    +VARCHAR(100) email
+	    +VARCHAR(255) password_hash
+	    +DECIMAL(15,2) balance
+	    +CHAR(1) tipo  // F/E
+    }
+
+    class ACCOUNT_PF {
+	    +CHAR(10) account_number  // PK, FK -> ACCOUNT
+	    +CHAR(11) cpf
+    }
+
+    class ACCOUNT_EMPRESA {
+	    +CHAR(10) account_number  // PK, FK -> ACCOUNT
+	    +CHAR(14) cnpj
+    }
+
+    class ASSET {
+	    +VARCHAR(10) symbol
+	    +VARCHAR(100) name
+	    +DECIMAL(15,2) current_value
+    }
+
+    class ACCOUNT_ASSET {
+	    +CHAR(10) account_number  // PK, FK -> ACCOUNT
+	    +VARCHAR(10) symbol       // PK, FK -> ASSET
+	    +DECIMAL(18,6) quantity
+    }
+
+    class OPERATION {
+	    +BIGINT id
+	    +TIMESTAMP datetime
+	    +CHAR(10) account_number  // FK -> ACCOUNT
+	    +VARCHAR(10) symbol       // FK -> ASSET
+	    +CHAR(1) type             // B/S
+	    +DECIMAL(18,6) quantity
+	    +DECIMAL(15,2) price
+    }
+
+    class TRANSFER {
+	    +BIGINT id
+	    +TIMESTAMP datetime
+	    +CHAR(10) from_account    // FK -> ACCOUNT(nullable)
+	    +CHAR(10) to_account      // FK -> ACCOUNT(nullable)
+	    +VARCHAR(10) symbol       // FK -> ASSET(nullable)
+	    +DECIMAL(18,6) quantity   // nullable
+	    +DECIMAL(15,2) amount     // nullable
+	    +VARCHAR(20) type         // SAQUE/DEPOSITO/TRANSFER_ATIVO
+    }
+
+	note "This is a sample note"
+
+    ACCOUNT "1" -- "1" ACCOUNT_PF : PF
+    ACCOUNT "1" -- "1" ACCOUNT_EMPRESA : EMPRESA
+    ACCOUNT "1" -- "many" OPERATION : realiza
+    ACCOUNT "1" -- "many" TRANSFER : origem/destino
+    ACCOUNT "1" -- "many" ACCOUNT_ASSET : possui
+    ASSET "1" -- "many" ACCOUNT_ASSET : compõe
+    ASSET "1" -- "many" OPERATION : negociado
+    ASSET "0..1" -- "many" TRANSFER : transferido

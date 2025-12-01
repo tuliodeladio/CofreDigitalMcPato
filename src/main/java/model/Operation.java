@@ -3,27 +3,47 @@ package model;
 import java.time.LocalDateTime;
 
 public class Operation {
-    public enum Type { BUY, SELL }
-    private final String accountNumber;
-    private final String assetSymbol;
-    private final double amount;
-    private final double price;
-    private final Type type;
-    private final LocalDateTime date;
 
-    public Operation(String accountNumber, String assetSymbol, double amount, double price, Type type) {
-        this.accountNumber = accountNumber;
-        this.assetSymbol = assetSymbol;
-        this.amount = amount;
-        this.price = price;
-        this.type = type;
-        this.date = LocalDateTime.now();
+    public enum Type {
+        BUY("B"), SELL("S");
+
+        private final String code;
+
+        Type(String code) { this.code = code; }
+        public String getCode() { return code; }
+        public static Type fromCode(String code) {
+            for (Type type : Type.values()) {
+                if (type.code.equals(code)) return type;
+            }
+            throw new IllegalArgumentException("Tipo inválido: " + code);
+        }
     }
 
+    private long id;
+    private String accountNumber;
+    private String symbol;
+    private Type type;
+    private double quantity;
+    private double price;
+    private LocalDateTime dateTime;
+
+    public Operation(long id, String accountNumber, String symbol, Type type,
+                     double quantity, double price, LocalDateTime dateTime) {
+        this.id = id;
+        this.accountNumber = accountNumber;
+        this.symbol = symbol;
+        this.type = type;
+        this.quantity = quantity;
+        this.price = price;
+        this.dateTime = dateTime;
+    }
+
+    public long getId() { return id; }
     public String getAccountNumber() { return accountNumber; }
-    public String getAssetSymbol() { return assetSymbol; }
-    public double getAmount() { return amount; }
-    public double getPrice() { return price; }
+    public String getSymbol() { return symbol; }
     public Type getType() { return type; }
-    public LocalDateTime getDate() { return date; }
+    public String getTypeCode() { return type.getCode(); }
+    public double getQuantity() { return quantity; }
+    public double getPrice() { return price; }
+    public LocalDateTime getDateTime() { return dateTime; }
 }

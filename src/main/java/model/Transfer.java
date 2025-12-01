@@ -3,39 +3,33 @@ package model;
 import java.time.LocalDateTime;
 
 public class Transfer {
-    private final String fromAccount;
-    private final String toAccount;
-    private final String assetSymbol;
-    private final double amount;
-    private final LocalDateTime date;
+    private long id;
+    private String fromAccount;
+    private String toAccount;
+    private String symbol;
+    private Double quantity;
+    private Double amount;
+    private String type;
+    private LocalDateTime dateTime;
 
-    public Transfer(String fromAccount, String toAccount, String assetSymbol, double amount) {
+    public Transfer(long id, String fromAccount, String toAccount, String symbol,
+                    Double quantity, Double amount, String type, LocalDateTime dateTime) {
+        this.id = id;
         this.fromAccount = fromAccount;
         this.toAccount = toAccount;
-        this.assetSymbol = assetSymbol;
+        this.symbol = symbol;
+        this.quantity = quantity;
         this.amount = amount;
-        this.date = LocalDateTime.now();
+        this.type = type;
+        this.dateTime = dateTime;
     }
 
-    public Transfer(String fromAccount, double amount) {
-        this.fromAccount = fromAccount;
-        this.toAccount = "External Account";
-        this.assetSymbol = "BRL";
-        this.amount = amount;
-        this.date = LocalDateTime.now();
-    }
-
-    public Transfer(String toAccount, double amount, String Metodo) {
-        this.fromAccount = "External Account with " + Metodo;
-        this.toAccount = toAccount;
-        this.assetSymbol = "BRL";
-        this.amount = amount;
-        this.date = LocalDateTime.now();
-    }
-
+    public long getId() { return id; }
     public String getFromAccount() { return fromAccount; }
     public String getToAccount() { return toAccount; }
-    public String getAssetSymbol() { return assetSymbol; }
-    public double getAmount() { return amount; }
-    public LocalDateTime getDate() { return date; }
+    public String getSymbol() { return symbol; }
+    public Double getQuantity() { return quantity; }
+    public Double getAmount() { return amount; }
+    public String getType() { return type; }
+    public LocalDateTime getDateTime() { return dateTime; }
 }

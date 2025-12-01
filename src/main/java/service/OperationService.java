@@ -1,46 +1,69 @@
 package service;
 
-import java.util.ArrayList;
-import java.util.List;
 import model.Account;
 import model.Asset;
 import model.Operation;
 
-public class OperationService {
-    private final List<Operation> operations = new ArrayList<>();
+import java.time.LocalDateTime;
+import java.util.*;
 
-    // Mtodo para comprar ativo
-    public boolean buyAsset(Account account, Asset asset, double qtd) {
-        double valorTotal = qtd * asset.getCurrentValue();
-        if(account.withdraw(valorTotal)) {
-            account.addAsset(asset.getSymbol(), qtd);
-            Operation opCompra = new Operation(account.getAccountNumber(), asset.getSymbol(), qtd, asset.getCurrentValue(), Operation.Type.BUY);
-            operations.add(opCompra);
-            return true;
+public class OperationService {
+
+    private static Map<String, List<Operation>> operacoesPorConta = new HashMap<>();
+
+    public boolean buyAsset(Account account, Asset asset, double quantity) {
+        double totalCost = asset.getCurrentValue() * quantity;
+        if (!account.withdraw(totalCost)) {
+            return false;
         }
-        return false;
+
+        account.addAsset(asset.getSymbol(), quantity);
+
+        Operation operacao = new Operation(
+                System.currentTimeMillis(),
+                account.getAccountNumber(),
+                asset.getSymbol(),
+                Operation.Type.BUY,
+                quantity,
+                asset.getCurrentValue(),
+                LocalDateTime.now()
+        );
+
+        adicionarOperacao(account.getAccountNumber(), operacao);
+        return true;
     }
 
-    // Mtodo para vender ativo
-    public boolean sellAsset(Account account, Asset asset, double qtd) {
-        if(account.getAsset(asset.getSymbol()) >= qtd) {
-            account.removeAsset(asset.getSymbol(), qtd);
-            double valorTotal = qtd * asset.getCurrentValue();
-            account.deposit(valorTotal);
-            Operation opVenda = new Operation(account.getAccountNumber(), asset.getSymbol(), qtd, asset.getCurrentValue(), Operation.Type.SELL);
-            operations.add(opVenda);
-            return true;
+    public boolean sellAsset(Account account, Asset asset, double quantity) {
+        double qtdAtual = account.getAsset(asset.getSymbol());
+        if (qtdAtual < quantity) {
+            return false;
         }
-        return false;
+
+        double totalValue = asset.getCurrentValue() * quantity;
+        account.removeAsset(asset.getSymbol(), quantity);
+        account.deposit(totalValue);
+
+        Operation operacao = new Operation(
+                System.currentTimeMillis(),
+                account.getAccountNumber(),
+                asset.getSymbol(),
+                Operation.Type.SELL,
+                quantity,
+                asset.getCurrentValue(),
+                LocalDateTime.now()
+        );
+
+        adicionarOperacao(account.getAccountNumber(), operacao);
+        return true;
     }
 
     public List<Operation> listByAccount(String accountNumber) {
-        List<Operation> result = new ArrayList<>();
-        for (Operation o : operations) {
-            if (o.getAccountNumber().equals(accountNumber)) {
-                result.add(o);
-            }
-        }
-        return result;
+        return operacoesPorConta.getOrDefault(accountNumber, new ArrayList<>());
+    }
+
+    private void adicionarOperacao(String accountNumber, Operation operacao) {
+        operacoesPorConta
+                .computeIfAbsent(accountNumber, k -> new ArrayList<>())
+                .add(operacao);
     }
 }
