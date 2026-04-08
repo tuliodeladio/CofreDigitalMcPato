@@ -1,5 +1,6 @@
 package dao;
 
+import factory.ConnectionFactory;
 import model.AccountPessoaFisica;
 import java.sql.*;
 import java.util.ArrayList;
