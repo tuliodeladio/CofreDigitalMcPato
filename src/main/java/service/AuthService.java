@@ -1,6 +1,7 @@
 package service;
 
 import java.security.MessageDigest;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import dao.AccountDAO;
@@ -10,7 +11,13 @@ public class AuthService {
     private final Map<String, Account> accounts = new HashMap<>();
 
     public void register(Account account) {
-        accounts.put(account.getEmail(), account);
+        AccountDAO dao = new AccountDAO();
+
+        try {
+            dao.insert(account);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Account login(String email, String password) {
