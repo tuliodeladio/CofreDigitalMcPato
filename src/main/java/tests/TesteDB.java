@@ -19,8 +19,12 @@ public class TesteDB {
                 "12345678900"
         );
 
-        dao.insert(acc);
-        System.out.println("Inserido!");
+        try {
+            dao.insert(acc);
+            System.out.println("Inserido!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // UPDATE
         acc.deposit(500);
