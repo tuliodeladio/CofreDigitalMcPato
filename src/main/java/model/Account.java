@@ -5,22 +5,25 @@ import java.util.Map;
 
 public abstract class Account {
     protected String accountNumber;
+    protected String documentNumber;
     protected String name;
     protected String email;
     protected String passwordHash;
     protected double balance;
     protected Map<String, Double> wallet;
 
-    public Account(String accountNumber, String name, String email, String passwordHash) {
+    public Account(String accountNumber, String name, String email, String passwordHash, String documentNumber) {
         this.accountNumber = accountNumber;
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
         this.balance = 0.0;
         this.wallet = new HashMap<>();
+        this.documentNumber = documentNumber;
     }
 
     public String getAccountNumber() { return accountNumber; }
+    public String getDocumentNumber() { return documentNumber; }
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getPasswordHash() { return passwordHash; }
