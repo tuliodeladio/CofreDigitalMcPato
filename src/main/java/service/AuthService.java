@@ -9,10 +9,6 @@ import model.Account;
 public class AuthService {
     private final Map<String, Account> accounts = new HashMap<>();
 
-    public Map<String, Account> getAccounts() {
-        return accounts;
-    }
-
     public void register(Account account) {
         accounts.put(account.getEmail(), account);
     }
