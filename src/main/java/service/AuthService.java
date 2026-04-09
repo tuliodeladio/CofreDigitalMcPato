@@ -3,6 +3,7 @@ package service;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
+import dao.AccountDAO;
 import model.Account;
 
 public class AuthService {
@@ -17,7 +18,8 @@ public class AuthService {
     }
 
     public Account login(String email, String password) {
-        Account account = accounts.get(email);
+        Account account = AccountDAO.findByEmail(email);
+
         if (account == null) return null;
         String hash = hashPassword(password);
         if (account.getPasswordHash().equals(hash)) {
