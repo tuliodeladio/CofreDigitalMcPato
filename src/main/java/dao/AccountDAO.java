@@ -111,7 +111,7 @@ public class AccountDAO {
         }
 
         return acc;
-    };
+    }
 
     public static Account mapAccount(ResultSet rs, String email) throws SQLException {
         String account_type = rs.getString("acc_type");
@@ -123,5 +123,5 @@ public class AccountDAO {
         return account_type.equalsIgnoreCase("f")
             ? new AccountPessoaFisica(account_number, name, email, pwd_hash, doc_number)
             : new AccountEmpresa(account_number, name, email, pwd_hash, doc_number);
-    };
+    }
 }
