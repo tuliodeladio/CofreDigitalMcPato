@@ -11,7 +11,7 @@ import java.util.List;
 
 public class AccountDAO {
 
-    public void insert(AccountPessoaFisica acc) {
+    public void insert(Account acc) throws SQLException {
         String sql = "INSERT INTO account VALUES (?,?,?,?,?,?,?)";
 
         try (Connection con = ConnectionFactory.getConnection();
@@ -23,7 +23,7 @@ public class AccountDAO {
             ps.setString(4, acc.getPasswordHash());
             ps.setDouble(5, acc.getBalance());
             ps.setString(6, "f");
-            ps.setString(7, acc.getCpf());
+            ps.setString(7, acc.getDocumentNumber());
 
             ps.executeUpdate();
 
