@@ -381,11 +381,6 @@ public class Main {
             sc.close();
         }
 
-        // Requisito: criação/atualização de arquivos texto a partir de ArrayList/HashMap
-        fileExportService.salvarOperacoesEmArquivo(operacoes, "operacoes.txt");
-        fileExportService.salvarTransferenciasEmArquivo(transferencias, "transferencias.txt");
-        fileExportService.salvarContasEmArquivo(accountMap, "contas.txt");
-
-        System.out.println("Aplicação encerrada. Arquivos gerados.");
+        System.out.println("Aplicação encerrada.");
     }
 }
