@@ -108,7 +108,6 @@ public class Main {
                             }
 
                             authService.register(acc);
-                            accountMap.put(acc.getAccountNumber(), acc);
                             System.out.println("Conta registrada! Número: " + acc.getAccountNumber());
                         } catch (ValidationException ve) {
                             System.out.println(ve.getMessage());
