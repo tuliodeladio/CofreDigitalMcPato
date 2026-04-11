@@ -9,7 +9,7 @@ CREATE TABLE account (
     acc_document_number CHAR(14) NOT NULL
 );
 
-COMMENT ON COLUMN account.acc_type IS 'Type pode ser F de Pessoa Física ou J de Pessoa Jurídica.';
+COMMENT ON COLUMN account.acc_type IS 'Type pode ser F de Pessoa Física ou E de Empresa.';
 COMMENT ON COLUMN account.acc_document_number IS 'Document Number pode ser CPF ou CNPJ';
 
 -- ADICIONA CONSTRAINTS À TABELA ACCOUNT
@@ -22,7 +22,7 @@ ALTER TABLE account ADD CONSTRAINT un_account_pwd_hash UNIQUE (acc_password_hash
 ALTER TABLE account ADD CONSTRAINT un_account_document_number UNIQUE (acc_document_number);
 
 -- ADICIONA CONSTRAINT CHECKS
-ALTER TABLE account ADD CONSTRAINT ck_account_type CHECK (LOWER(acc_type) IN ('f', 'j'));
+ALTER TABLE account ADD CONSTRAINT ck_account_type CHECK (UPPER(acc_type) IN ('F', 'E'));
 
 
 
