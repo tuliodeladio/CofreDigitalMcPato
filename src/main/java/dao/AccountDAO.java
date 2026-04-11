@@ -22,7 +22,7 @@ public class AccountDAO {
             ps.setString(3, acc.getEmail());
             ps.setString(4, acc.getPasswordHash());
             ps.setDouble(5, acc.getBalance());
-            ps.setString(6, "f");
+            ps.setString(6, acc.getAccountType());
             ps.setString(7, acc.getDocumentNumber());
 
             ps.executeUpdate();
