@@ -1,6 +1,8 @@
 package service;
 
+import dao.AccountAssetDAO;
 import model.Account;
+import model.AccountAsset;
 import model.Asset;
 import model.Operation;
 
@@ -12,13 +14,20 @@ public class OperationService {
     private static Map<String, List<Operation>> operacoesPorConta = new HashMap<>();
 
     public boolean buyAsset(Account account, Asset asset, double quantity) {
+        // Calcula custo total
+        // Deduz da carteira
         double totalCost = asset.getCurrentValue() * quantity;
         if (!account.withdraw(totalCost)) {
             return false;
         }
 
+        // Upsert em Account Asset
+        accountAssetUpsert(account.getAccountNumber(), asset.getSymbol(), quantity);
+
+        // Atualiza carteira
         account.addAsset(asset.getSymbol(), quantity);
 
+        // Adiciona operação
         Operation operacao = new Operation(
                 System.currentTimeMillis(),
                 account.getAccountNumber(),
@@ -39,8 +48,11 @@ public class OperationService {
             return false;
         }
 
+        // Upsert em Account Asset
+        accountAssetUpsert(account.getAccountNumber(), asset.getSymbol(), quantity);
+
+        // Atualiza carteira
         double totalValue = asset.getCurrentValue() * quantity;
-        account.removeAsset(asset.getSymbol(), quantity);
         account.deposit(totalValue);
 
         Operation operacao = new Operation(
@@ -58,6 +70,7 @@ public class OperationService {
     }
 
     public List<Operation> listByAccount(String accountNumber) {
+        // Lista todos os operations
         return operacoesPorConta.getOrDefault(accountNumber, new ArrayList<>());
     }
 
@@ -65,5 +78,22 @@ public class OperationService {
         operacoesPorConta
                 .computeIfAbsent(accountNumber, k -> new ArrayList<>())
                 .add(operacao);
+    }
+
+    private void accountAssetUpsert(String accountNumber, String assetSymbol, double quantity) {
+        AccountAssetDAO accountAssetDAO = new AccountAssetDAO();
+        AccountAsset accountAsset = accountAssetDAO.findAccountAsset(accountNumber, assetSymbol);
+
+        if (accountAsset != null) {
+            if (quantity == 0) {
+                accountAssetDAO.delete(accountAsset);
+            } else {
+                accountAsset.setQuantity(quantity);
+                accountAssetDAO.update(accountAsset);
+            }
+        } else {
+            accountAssetDAO.insert(new AccountAsset(accountNumber, assetSymbol, quantity));
+        }
+
     }
 }
