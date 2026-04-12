@@ -2,7 +2,6 @@ package dao;
 
 import factory.ConnectionFactory;
 import model.AccountAsset;
-import model.Asset;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -88,6 +87,8 @@ public class AccountAssetDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return accountAsset;
     }
 
     public List<AccountAsset> listAllByAccount(String accountNumber) {
