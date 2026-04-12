@@ -17,39 +17,52 @@ public class OperationService {
         // Calcula custo total
         // Deduz da carteira
         double totalCost = asset.getCurrentValue() * quantity;
+        String sym = asset.getSymbol();
+        String accountNumber = account.getAccountNumber();
+
         if (!account.withdraw(totalCost)) {
             return false;
         }
 
+        AccountAssetDAO dao = new AccountAssetDAO();
+        AccountAsset accountAsset = dao.findAccountAsset(accountNumber, sym);
+        double qtdAtual = accountAsset != null ? accountAsset.getQuantity() : account.getAsset(sym);
+
         // Upsert em Account Asset
-        accountAssetUpsert(account.getAccountNumber(), asset.getSymbol(), quantity);
+        accountAssetUpsert(accountNumber, sym, qtdAtual + quantity);
 
         // Atualiza carteira
-        account.addAsset(asset.getSymbol(), quantity);
+        account.addAsset(sym, quantity);
 
         // Adiciona operação
         Operation operacao = new Operation(
                 System.currentTimeMillis(),
-                account.getAccountNumber(),
-                asset.getSymbol(),
+                accountNumber,
+                sym,
                 Operation.Type.BUY,
                 quantity,
                 asset.getCurrentValue(),
                 LocalDateTime.now()
         );
 
-        adicionarOperacao(account.getAccountNumber(), operacao);
+        adicionarOperacao(accountNumber, operacao);
         return true;
     }
 
     public boolean sellAsset(Account account, Asset asset, double quantity) {
-        double qtdAtual = account.getAsset(asset.getSymbol());
+        String sym = asset.getSymbol();
+        String accountNumber = account.getAccountNumber();
+
+        AccountAssetDAO dao = new AccountAssetDAO();
+        AccountAsset accountAsset = dao.findAccountAsset(accountNumber, sym);
+        double qtdAtual = accountAsset != null ? accountAsset.getQuantity() : account.getAsset(sym);
+
         if (qtdAtual < quantity) {
             return false;
         }
 
         // Upsert em Account Asset
-        accountAssetUpsert(account.getAccountNumber(), asset.getSymbol(), quantity);
+        accountAssetUpsert(accountNumber, sym, qtdAtual - quantity);
 
         // Atualiza carteira
         double totalValue = asset.getCurrentValue() * quantity;
@@ -57,15 +70,15 @@ public class OperationService {
 
         Operation operacao = new Operation(
                 System.currentTimeMillis(),
-                account.getAccountNumber(),
-                asset.getSymbol(),
+                accountNumber,
+                sym,
                 Operation.Type.SELL,
                 quantity,
                 asset.getCurrentValue(),
                 LocalDateTime.now()
         );
 
-        adicionarOperacao(account.getAccountNumber(), operacao);
+        adicionarOperacao(accountNumber, operacao);
         return true;
     }
 
