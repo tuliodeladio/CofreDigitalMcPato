@@ -1,5 +1,6 @@
 package app;
 
+import dao.AccountAssetDAO;
 import model.*;
 import service.*;
 import validator.*;
@@ -163,7 +164,11 @@ public class Main {
 
                         for (Asset a : assets) {
                             String sym = a.getSymbol();
-                            double qtd = currentUser.getAsset(sym);
+
+                            AccountAssetDAO dao = new AccountAssetDAO();
+                            AccountAsset accountAsset = dao.findAccountAsset(currentUser.getAccountNumber(), sym);
+
+                            double qtd = accountAsset != null ? accountAsset.getQuantity() : currentUser.getAsset(sym);
 
                             if (qtd > 0) {
                                 System.out.println(sym + ": " + String.format("%.6f", qtd));
