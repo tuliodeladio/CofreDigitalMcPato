@@ -1,5 +1,7 @@
 package model;
 
+import dao.AccountAssetDAO;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +42,12 @@ public abstract class Account {
     }
 
     public Map<String, Double> getWallet() { return wallet; }
-    public double getAsset(String symbol) { return wallet.getOrDefault(symbol, 0.0); }
+    public double getAsset(String symbol) {
+        AccountAssetDAO dao = new AccountAssetDAO();
+        AccountAsset asset = dao.findAccountAsset(this.accountNumber, symbol);
+
+        return asset != null ? asset.getQuantity() : 0.0;
+    }
     public void addAsset(String symbol, double quantity) {
         wallet.put(symbol, wallet.getOrDefault(symbol, 0.0) + quantity);
     }
