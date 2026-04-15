@@ -38,7 +38,7 @@ public class OperationService {
         account.addAsset(sym, quantity);
 
         // Registra a operação no banco de dados
-        adicionarOperacao(accountNumber, sym, quantity, price);
+        adicionarOperacao(accountNumber, sym, quantity, price, Operation.Type.BUY);
 
         System.out.println("Compra realizada!");
     }
@@ -67,7 +67,7 @@ public class OperationService {
         account.deposit(totalValue);
 
         // Registra a operação no banco de dados
-        adicionarOperacao(accountNumber, sym, quantity, price);
+        adicionarOperacao(accountNumber, sym, quantity, price, Operation.Type.SELL);
 
         System.out.println("Venda realizada! Valor creditado na conta.");
     }
@@ -78,12 +78,12 @@ public class OperationService {
         return dao.listByAccount(accountNumber);
     }
 
-    private void adicionarOperacao(String accountNumber, String sym, double quantity, double price) {
+    private void adicionarOperacao(String accountNumber, String sym, double quantity, double price, Operation.Type opType) {
         Operation operacao = new Operation(
             System.currentTimeMillis(),
             accountNumber,
             sym,
-            Operation.Type.SELL,
+            opType,
             quantity,
             price,
             LocalDateTime.now()
