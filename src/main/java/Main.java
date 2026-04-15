@@ -192,20 +192,10 @@ public class Main {
                             System.out.print("Quantidade: ");
                             double qtd = Double.parseDouble(sc.nextLine());
 
-                            boolean resultado;
-
                             if ("C".equals(tipoOp)) {
-                                AssetOperationValidator.validateBuy(currentUser, assetSelecionado, qtd);
-                                resultado = operationService.buyAsset(currentUser, assetSelecionado, qtd);
-
-                                System.out.println(resultado ? "Compra realizada!" : "Saldo insuficiente!");
+                                operationService.buyAsset(currentUser, assetSelecionado, qtd);
                             } else if ("V".equals(tipoOp)) {
-                                AssetOperationValidator.validateSell(currentUser, assetSelecionado, qtd);
-                                resultado = operationService.sellAsset(currentUser, assetSelecionado, qtd);
-
-                                System.out.println(resultado
-                                        ? "Venda realizada! Valor creditado na conta."
-                                        : "Você não possui quantidade suficiente do ativo!");
+                                operationService.sellAsset(currentUser, assetSelecionado, qtd);
                             } else {
                                 System.out.println("Tipo de operação inválido.");
                             }

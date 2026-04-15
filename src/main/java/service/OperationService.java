@@ -6,13 +6,16 @@ import model.Account;
 import model.AccountAsset;
 import model.Asset;
 import model.Operation;
+import validator.AssetOperationValidator;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class OperationService {
 
-    public boolean buyAsset(Account account, Asset asset, double quantity) {
+    public void buyAsset(Account account, Asset asset, double quantity) {
+        AssetOperationValidator.validateBuy(account, asset, quantity);
+
         // Calcula custo total
         double price = asset.getCurrentValue();
         double totalCost = price * quantity;
@@ -21,7 +24,7 @@ public class OperationService {
 
         // Deduz da carteira
         if (!account.withdraw(totalCost)) {
-            return false;
+            System.out.println("Saldo insuficiente!");
         }
 
         AccountAssetDAO dao = new AccountAssetDAO();
@@ -34,22 +37,15 @@ public class OperationService {
         // Atualiza carteira
         account.addAsset(sym, quantity);
 
-        // Adiciona operação
-        Operation operacao = new Operation(
-                System.currentTimeMillis(),
-                accountNumber,
-                sym,
-                Operation.Type.BUY,
-                quantity,
-                price,
-                LocalDateTime.now()
-        );
+        // Registra a operação no banco de dados
+        adicionarOperacao(accountNumber, sym, quantity, price);
 
-        adicionarOperacao(operacao);
-        return true;
+        System.out.println("Compra realizada!");
     }
 
-    public boolean sellAsset(Account account, Asset asset, double quantity) {
+    public void sellAsset(Account account, Asset asset, double quantity) {
+        AssetOperationValidator.validateSell(account, asset, quantity);
+
         double price = asset.getCurrentValue();
         String sym = asset.getSymbol();
         String accountNumber = account.getAccountNumber();
@@ -59,7 +55,8 @@ public class OperationService {
         double qtdAtual = accountAsset != null ? accountAsset.getQuantity() : account.getAsset(sym);
 
         if (qtdAtual < quantity) {
-            return false;
+            System.out.println("Você não possui quantidade suficiente do ativo!");
+            return;
         }
 
         // Upsert em Account Asset
@@ -69,18 +66,10 @@ public class OperationService {
         double totalValue = price * quantity;
         account.deposit(totalValue);
 
-        Operation operacao = new Operation(
-                System.currentTimeMillis(),
-                accountNumber,
-                sym,
-                Operation.Type.SELL,
-                quantity,
-                price,
-                LocalDateTime.now()
-        );
+        // Registra a operação no banco de dados
+        adicionarOperacao(accountNumber, sym, quantity, price);
 
-        adicionarOperacao(operacao);
-        return true;
+        System.out.println("Venda realizada! Valor creditado na conta.");
     }
 
     public List<Operation> listByAccount(String accountNumber) {
@@ -89,7 +78,17 @@ public class OperationService {
         return dao.listByAccount(accountNumber);
     }
 
-    private void adicionarOperacao(Operation operacao) {
+    private void adicionarOperacao(String accountNumber, String sym, double quantity, double price) {
+        Operation operacao = new Operation(
+            System.currentTimeMillis(),
+            accountNumber,
+            sym,
+            Operation.Type.SELL,
+            quantity,
+            price,
+            LocalDateTime.now()
+        );
+
         OperationDAO dao = new OperationDAO();
         dao.insert(operacao);
     }
