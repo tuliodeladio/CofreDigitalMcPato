@@ -33,12 +33,4 @@ public class AssetService {
         AssetDAO dao = new AssetDAO();
         dao.updateAllPrices();
     }
-
-    //    public Asset getAsset(String symbol) {
-//        return assets.get(symbol.toUpperCase());
-//    }
-
-//    public void addAsset(String symbol, String name, double price) {
-//        assets.put(symbol.toUpperCase(), new Asset(symbol.toUpperCase(), name, price));
-//    }
 }
