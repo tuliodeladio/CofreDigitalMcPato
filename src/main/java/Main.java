@@ -164,11 +164,7 @@ public class Main {
 
                         for (Asset a : assets) {
                             String sym = a.getSymbol();
-
-                            AccountAssetDAO dao = new AccountAssetDAO();
-                            AccountAsset accountAsset = dao.findAccountAsset(currentUser.getAccountNumber(), sym);
-
-                            double qtd = accountAsset != null ? accountAsset.getQuantity() : currentUser.getAsset(sym);
+                            double qtd = currentUser.getAsset(sym);
 
                             if (qtd > 0) {
                                 System.out.println(sym + ": " + String.format("%.6f", qtd));
@@ -197,39 +193,16 @@ public class Main {
                             double qtd = Double.parseDouble(sc.nextLine());
 
                             boolean resultado;
-                            Operation opRealizada = null;
 
                             if ("C".equals(tipoOp)) {
                                 AssetOperationValidator.validateBuy(currentUser, assetSelecionado, qtd);
                                 resultado = operationService.buyAsset(currentUser, assetSelecionado, qtd);
-                                if (resultado) {
-                                    opRealizada = new Operation(
-                                            nextOperationId++,
-                                            currentUser.getAccountNumber(),
-                                            assetSelecionado.getSymbol(),
-                                            Operation.Type.BUY,
-                                            qtd,
-                                            assetSelecionado.getCurrentValue(),
-                                            LocalDateTime.now()
-                                    );
-                                    operacoes.add(opRealizada);
-                                }
+
                                 System.out.println(resultado ? "Compra realizada!" : "Saldo insuficiente!");
                             } else if ("V".equals(tipoOp)) {
                                 AssetOperationValidator.validateSell(currentUser, assetSelecionado, qtd);
                                 resultado = operationService.sellAsset(currentUser, assetSelecionado, qtd);
-                                if (resultado) {
-                                    opRealizada = new Operation(
-                                            nextOperationId++,
-                                            currentUser.getAccountNumber(),
-                                            assetSelecionado.getSymbol(),
-                                            Operation.Type.SELL,
-                                            qtd,
-                                            assetSelecionado.getCurrentValue(),
-                                            LocalDateTime.now()
-                                    );
-                                    operacoes.add(opRealizada);
-                                }
+
                                 System.out.println(resultado
                                         ? "Venda realizada! Valor creditado na conta."
                                         : "Você não possui quantidade suficiente do ativo!");
