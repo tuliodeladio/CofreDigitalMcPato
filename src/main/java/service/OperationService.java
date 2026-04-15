@@ -1,6 +1,7 @@
 package service;
 
 import dao.AccountAssetDAO;
+import dao.OperationDAO;
 import model.Account;
 import model.AccountAsset;
 import model.Asset;
@@ -11,15 +12,14 @@ import java.util.*;
 
 public class OperationService {
 
-    private static Map<String, List<Operation>> operacoesPorConta = new HashMap<>();
-
     public boolean buyAsset(Account account, Asset asset, double quantity) {
         // Calcula custo total
-        // Deduz da carteira
-        double totalCost = asset.getCurrentValue() * quantity;
+        double price = asset.getCurrentValue();
+        double totalCost = price * quantity;
         String sym = asset.getSymbol();
         String accountNumber = account.getAccountNumber();
 
+        // Deduz da carteira
         if (!account.withdraw(totalCost)) {
             return false;
         }
@@ -41,15 +41,16 @@ public class OperationService {
                 sym,
                 Operation.Type.BUY,
                 quantity,
-                asset.getCurrentValue(),
+                price,
                 LocalDateTime.now()
         );
 
-        adicionarOperacao(accountNumber, operacao);
+        adicionarOperacao(operacao);
         return true;
     }
 
     public boolean sellAsset(Account account, Asset asset, double quantity) {
+        double price = asset.getCurrentValue();
         String sym = asset.getSymbol();
         String accountNumber = account.getAccountNumber();
 
@@ -65,7 +66,7 @@ public class OperationService {
         accountAssetUpsert(accountNumber, sym, qtdAtual - quantity);
 
         // Atualiza carteira
-        double totalValue = asset.getCurrentValue() * quantity;
+        double totalValue = price * quantity;
         account.deposit(totalValue);
 
         Operation operacao = new Operation(
@@ -74,23 +75,23 @@ public class OperationService {
                 sym,
                 Operation.Type.SELL,
                 quantity,
-                asset.getCurrentValue(),
+                price,
                 LocalDateTime.now()
         );
 
-        adicionarOperacao(accountNumber, operacao);
+        adicionarOperacao(operacao);
         return true;
     }
 
     public List<Operation> listByAccount(String accountNumber) {
-        // Lista todos os operations
-        return operacoesPorConta.getOrDefault(accountNumber, new ArrayList<>());
+        // Lista todas as operações
+        OperationDAO dao = new OperationDAO();
+        return dao.listByAccount(accountNumber);
     }
 
-    private void adicionarOperacao(String accountNumber, Operation operacao) {
-        operacoesPorConta
-                .computeIfAbsent(accountNumber, k -> new ArrayList<>())
-                .add(operacao);
+    private void adicionarOperacao(Operation operacao) {
+        OperationDAO dao = new OperationDAO();
+        dao.insert(operacao);
     }
 
     private void accountAssetUpsert(String accountNumber, String assetSymbol, double quantity) {
