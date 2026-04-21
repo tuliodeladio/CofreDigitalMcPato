@@ -61,9 +61,9 @@ ALTER TABLE account_asset ADD CONSTRAINT un_account_asset_acc_number_asset_sym U
 -- CRIA TABELA TRANSFER
 CREATE TABLE transfer (
     id NUMBER(19, 0) NOT NULL,
-    from_account CHAR(10) NOT NULL,
-    to_account CHAR(10) NOT NULL,
-    asset_symbol VARCHAR(10) NOT NULL,
+    from_account CHAR(10),
+    to_account CHAR(10),
+    asset_symbol VARCHAR(10),
     quantity DECIMAL(18,6) DEFAULT 0,
     transfer_value DECIMAL(15,2) DEFAULT 0,
     transfer_type VARCHAR(20)
