@@ -1,14 +1,11 @@
-package app;
-
-import dao.AccountAssetDAO;
+import dao.AccountDAO;
+import record.*;
 import model.*;
 import service.*;
 import validator.*;
 
 import java.util.*;
 import java.io.*;
-import java.time.LocalDateTime;
-import java.util.stream.Collectors;
 
 public class Main {
 
@@ -32,11 +29,9 @@ public class Main {
         OperationService operationService = new OperationService();
         TransferService transferService = new TransferService();
         ReportService reportService = new ReportService();
-        FileExportService fileExportService = new FileExportService();
 
         // Requisito: ArrayList com pelo menos 2 classes
-        List<Operation> operacoes = new ArrayList<>();
-        List<Transfer> transferencias = new ArrayList<>();
+        List<record.Transfer> transferencias = new ArrayList<>();
 
         // Requisito: HashMap com pelo menos 2 classes
         Map<String, Account> accountMap = new HashMap<>();
@@ -44,8 +39,6 @@ public class Main {
 
         Account currentUser = null;
         boolean isAuthenticated = false;
-        long nextOperationId = 1L;
-        long nextTransferId = 1L;
 
         try {
             while (true) {
@@ -233,10 +226,7 @@ public class Main {
                                 try {
                                     System.out.print("Valor do saque (BRL): ");
                                     double valorSaque = Double.parseDouble(sc.nextLine());
-                                    Transfer t = transferService.withdraw(currentUser, valorSaque);
-                                    if (t != null) {
-                                        transferencias.add(t);
-                                    }
+                                    transferService.withdraw(currentUser, valorSaque);
                                 } catch (NumberFormatException e) {
                                     System.out.println("Valor inválido.");
                                 }
@@ -246,24 +236,23 @@ public class Main {
                                 try {
                                     System.out.print("Valor do depósito (BRL): ");
                                     double valorDeposito = Double.parseDouble(sc.nextLine());
-                                    Transfer t = transferService.deposit(currentUser, valorDeposito);
-                                    if (t != null) {
-                                        transferencias.add(t);
-                                    }
+                                    transferService.deposit(currentUser, valorDeposito);
                                 } catch (NumberFormatException e) {
                                     System.out.println("Valor inválido.");
                                 }
                                 break;
 
                             case 3:
-                                Map<String, Account> allAccounts = accountMap;
+                                AccountDAO accountDAO = new AccountDAO();
+                                List<Account> allAccounts = accountDAO.listAll();
+
                                 if (allAccounts.size() <= 1) {
                                     System.out.println("Não há outras contas cadastradas para transferir.");
                                     break;
                                 }
 
                                 System.out.println("Contas disponíveis para transferência:");
-                                for (Account acc : allAccounts.values()) {
+                                for (Account acc : allAccounts) {
                                     if (!acc.getAccountNumber().equals(currentUser.getAccountNumber())) {
                                         System.out.println("Nome: " + acc.getName()
                                                 + " | Conta: " + acc.getAccountNumber());
@@ -302,15 +291,8 @@ public class Main {
                                         break;
                                     }
 
-                                    TransferValidator.validateTransfer(currentUser, contaDestinoObj,
-                                            ativoTransf, qtdTransf);
-
-                                    Transfer t = transferService.transfer(currentUser, contaDestinoObj,
-                                            ativoTransf, qtdTransf);
-                                    if (t != null) {
-                                        transferencias.add(t);
-                                        System.out.println("Solicitação de transferência efetuada.");
-                                    }
+                                    TransferValidator.validateTransfer(currentUser, contaDestinoObj, ativoTransf, qtdTransf);
+                                    transferService.transfer(currentUser, contaDestinoObj, ativoTransf, qtdTransf);
 
                                 } catch (ValidationException ve) {
                                     System.out.println(ve.getMessage());
@@ -333,7 +315,7 @@ public class Main {
 
                         List<Operation> minhasOps =
                                 operationService.listByAccount(currentUser.getAccountNumber());
-                        List<Transfer> minhasTransfs =
+                        List<record.Transfer> minhasTransfs =
                                 transferService.listByUser(currentUser.getAccountNumber());
 
                         reportService.printReport(
