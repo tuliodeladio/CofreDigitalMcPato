@@ -1,69 +1,112 @@
 package service;
 
+import dao.AccountAssetDAO;
+import dao.OperationDAO;
 import model.Account;
+import model.AccountAsset;
 import model.Asset;
 import model.Operation;
+import validator.AssetOperationValidator;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class OperationService {
 
-    private static Map<String, List<Operation>> operacoesPorConta = new HashMap<>();
+    public void buyAsset(Account account, Asset asset, double quantity) {
+        AssetOperationValidator.validateBuy(account, asset, quantity);
 
-    public boolean buyAsset(Account account, Asset asset, double quantity) {
-        double totalCost = asset.getCurrentValue() * quantity;
+        // Calcula custo total
+        double price = asset.getCurrentValue();
+        double totalCost = price * quantity;
+        String sym = asset.getSymbol();
+        String accountNumber = account.getAccountNumber();
+
+        // Deduz da carteira
         if (!account.withdraw(totalCost)) {
-            return false;
+            System.out.println("Saldo insuficiente!");
         }
 
-        account.addAsset(asset.getSymbol(), quantity);
+        AccountAssetDAO dao = new AccountAssetDAO();
+        AccountAsset accountAsset = dao.findAccountAsset(accountNumber, sym);
+        double qtdAtual = accountAsset != null ? accountAsset.getQuantity() : account.getAsset(sym);
 
-        Operation operacao = new Operation(
-                System.currentTimeMillis(),
-                account.getAccountNumber(),
-                asset.getSymbol(),
-                Operation.Type.BUY,
-                quantity,
-                asset.getCurrentValue(),
-                LocalDateTime.now()
-        );
+        // Upsert em Account Asset
+        accountAssetUpsert(accountNumber, sym, qtdAtual + quantity);
 
-        adicionarOperacao(account.getAccountNumber(), operacao);
-        return true;
+        // Atualiza carteira
+        account.addAsset(sym, quantity);
+
+        // Registra a operação no banco de dados
+        adicionarOperacao(accountNumber, sym, quantity, price, Operation.Type.BUY);
+
+        System.out.println("Compra realizada!");
     }
 
-    public boolean sellAsset(Account account, Asset asset, double quantity) {
-        double qtdAtual = account.getAsset(asset.getSymbol());
+    public void sellAsset(Account account, Asset asset, double quantity) {
+        AssetOperationValidator.validateSell(account, asset, quantity);
+
+        double price = asset.getCurrentValue();
+        String sym = asset.getSymbol();
+        String accountNumber = account.getAccountNumber();
+
+        AccountAssetDAO dao = new AccountAssetDAO();
+        AccountAsset accountAsset = dao.findAccountAsset(accountNumber, sym);
+        double qtdAtual = accountAsset != null ? accountAsset.getQuantity() : account.getAsset(sym);
+
         if (qtdAtual < quantity) {
-            return false;
+            System.out.println("Você não possui quantidade suficiente do ativo!");
+            return;
         }
 
-        double totalValue = asset.getCurrentValue() * quantity;
-        account.removeAsset(asset.getSymbol(), quantity);
+        // Upsert em Account Asset
+        accountAssetUpsert(accountNumber, sym, qtdAtual - quantity);
+
+        // Atualiza carteira
+        double totalValue = price * quantity;
         account.deposit(totalValue);
 
-        Operation operacao = new Operation(
-                System.currentTimeMillis(),
-                account.getAccountNumber(),
-                asset.getSymbol(),
-                Operation.Type.SELL,
-                quantity,
-                asset.getCurrentValue(),
-                LocalDateTime.now()
-        );
+        // Registra a operação no banco de dados
+        adicionarOperacao(accountNumber, sym, quantity, price, Operation.Type.SELL);
 
-        adicionarOperacao(account.getAccountNumber(), operacao);
-        return true;
+        System.out.println("Venda realizada! Valor creditado na conta.");
     }
 
     public List<Operation> listByAccount(String accountNumber) {
-        return operacoesPorConta.getOrDefault(accountNumber, new ArrayList<>());
+        // Lista todas as operações
+        OperationDAO dao = new OperationDAO();
+        return dao.listByAccount(accountNumber);
     }
 
-    private void adicionarOperacao(String accountNumber, Operation operacao) {
-        operacoesPorConta
-                .computeIfAbsent(accountNumber, k -> new ArrayList<>())
-                .add(operacao);
+    private void adicionarOperacao(String accountNumber, String sym, double quantity, double price, Operation.Type opType) {
+        Operation operacao = new Operation(
+            System.currentTimeMillis(),
+            accountNumber,
+            sym,
+            opType,
+            quantity,
+            price,
+            LocalDateTime.now()
+        );
+
+        OperationDAO dao = new OperationDAO();
+        dao.insert(operacao);
+    }
+
+    private void accountAssetUpsert(String accountNumber, String assetSymbol, double quantity) {
+        AccountAssetDAO accountAssetDAO = new AccountAssetDAO();
+        AccountAsset accountAsset = accountAssetDAO.findAccountAsset(accountNumber, assetSymbol);
+
+        if (accountAsset != null) {
+            if (quantity == 0) {
+                accountAssetDAO.delete(accountAsset);
+            } else {
+                accountAsset.setQuantity(quantity);
+                accountAssetDAO.update(accountAsset);
+            }
+        } else {
+            accountAssetDAO.insert(new AccountAsset(accountNumber, assetSymbol, quantity));
+        }
+
     }
 }

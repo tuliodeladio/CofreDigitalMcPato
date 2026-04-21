@@ -1,5 +1,6 @@
 package app;
 
+import dao.AccountAssetDAO;
 import model.*;
 import service.*;
 import validator.*;
@@ -7,6 +8,7 @@ import validator.*;
 import java.util.*;
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -38,7 +40,7 @@ public class Main {
 
         // Requisito: HashMap com pelo menos 2 classes
         Map<String, Account> accountMap = new HashMap<>();
-        Map<String, Asset> assetMap = assetService.getAssets();
+        Map<String, Asset> assetMap = new HashMap<>();
 
         Account currentUser = null;
         boolean isAuthenticated = false;
@@ -154,27 +156,30 @@ public class Main {
                             break;
                         }
 
+                        assetService.updateAssets();
+                        List<Asset> assets = assetService.getAssets();
+
                         System.out.println("Seu saldo: R$ " + String.format("%.2f", currentUser.getBalance()));
                         System.out.println("Seus ativos:");
-                        for (String sym : assetMap.keySet()) {
+
+                        for (Asset a : assets) {
+                            String sym = a.getSymbol();
                             double qtd = currentUser.getAsset(sym);
+
                             if (qtd > 0) {
                                 System.out.println(sym + ": " + String.format("%.6f", qtd));
                             }
                         }
 
                         System.out.println("\nAtivos disponíveis:");
-                        for (String sym : assetMap.keySet()) {
-                            Asset a = assetMap.get(sym);
-                            assetService.updateAssetValue(a);
-                            System.out.println(sym + " - " + a.getName()
-                                    + " R$ " + String.format("%.2f", a.getCurrentValue()));
+                        for (Asset a : assets) {
+                            System.out.println(a.getSymbol() + " - " + a.getName() + " R$ " + String.format("%.2f", a.getCurrentValue()));
                         }
 
                         try {
                             System.out.print("Escolha o ativo (código): ");
                             String ativo = sc.nextLine().toUpperCase();
-                            Asset assetSelecionado = assetMap.get(ativo);
+                            Asset assetSelecionado = assets.stream().filter(a -> a.getSymbol().equals(ativo)).findFirst().orElse(null);
 
                             if (assetSelecionado == null) {
                                 System.out.println("Ativo não encontrado!");
@@ -187,43 +192,10 @@ public class Main {
                             System.out.print("Quantidade: ");
                             double qtd = Double.parseDouble(sc.nextLine());
 
-                            boolean resultado;
-                            Operation opRealizada = null;
-
                             if ("C".equals(tipoOp)) {
-                                AssetOperationValidator.validateBuy(currentUser, assetSelecionado, qtd);
-                                resultado = operationService.buyAsset(currentUser, assetSelecionado, qtd);
-                                if (resultado) {
-                                    opRealizada = new Operation(
-                                            nextOperationId++,
-                                            currentUser.getAccountNumber(),
-                                            assetSelecionado.getSymbol(),
-                                            Operation.Type.BUY,
-                                            qtd,
-                                            assetSelecionado.getCurrentValue(),
-                                            LocalDateTime.now()
-                                    );
-                                    operacoes.add(opRealizada);
-                                }
-                                System.out.println(resultado ? "Compra realizada!" : "Saldo insuficiente!");
+                                operationService.buyAsset(currentUser, assetSelecionado, qtd);
                             } else if ("V".equals(tipoOp)) {
-                                AssetOperationValidator.validateSell(currentUser, assetSelecionado, qtd);
-                                resultado = operationService.sellAsset(currentUser, assetSelecionado, qtd);
-                                if (resultado) {
-                                    opRealizada = new Operation(
-                                            nextOperationId++,
-                                            currentUser.getAccountNumber(),
-                                            assetSelecionado.getSymbol(),
-                                            Operation.Type.SELL,
-                                            qtd,
-                                            assetSelecionado.getCurrentValue(),
-                                            LocalDateTime.now()
-                                    );
-                                    operacoes.add(opRealizada);
-                                }
-                                System.out.println(resultado
-                                        ? "Venda realizada! Valor creditado na conta."
-                                        : "Você não possui quantidade suficiente do ativo!");
+                                operationService.sellAsset(currentUser, assetSelecionado, qtd);
                             } else {
                                 System.out.println("Tipo de operação inválido.");
                             }

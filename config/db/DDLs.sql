@@ -54,6 +54,9 @@ CREATE TABLE account_asset (
 ALTER TABLE account_asset ADD CONSTRAINT fk_account_asset_account_number FOREIGN KEY (account_number) REFERENCES account (acc_number) ON DELETE CASCADE;
 ALTER TABLE account_asset ADD CONSTRAINT fk_account_asset_asset_symbol FOREIGN KEY (asset_symbol) REFERENCES asset (asset_symbol) ON DELETE SET NULL;
 
+-- ADICIONA CONSTRAINTS DE UNICIDADE
+ALTER TABLE account_asset ADD CONSTRAINT un_account_asset_acc_number_asset_sym UNIQUE (account_number, asset_symbol);
+
 
 -- CRIA TABELA TRANSFER
 CREATE TABLE transfer (
