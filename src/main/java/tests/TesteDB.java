@@ -1,6 +1,7 @@
-package app;
+package tests;
 
 import dao.AccountDAO;
+import model.Account;
 import model.AccountPessoaFisica;
 
 public class TesteDB {
@@ -18,8 +19,12 @@ public class TesteDB {
                 "12345678900"
         );
 
-        dao.insert(acc);
-        System.out.println("Inserido!");
+        try {
+            dao.insert(acc);
+            System.out.println("Inserido!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // UPDATE
         acc.deposit(500);
@@ -31,6 +36,11 @@ public class TesteDB {
         dao.listAll().forEach(a ->
                 System.out.println(a.getAccountNumber() + " - " + a.getName())
         );
+
+        // Find By Email
+        System.out.println("\nBuscando conta por email teste@email.com");
+        Account account = AccountDAO.findByEmail("teste@email.com");
+        System.out.println(account.getAccountNumber() + " - " + account.getName() + " - " + account.getEmail());
 
         // DELETE
         dao.delete("9999999999");

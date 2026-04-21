@@ -1,23 +1,28 @@
 package service;
 
 import java.security.MessageDigest;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import dao.AccountDAO;
 import model.Account;
 
 public class AuthService {
     private final Map<String, Account> accounts = new HashMap<>();
 
-    public Map<String, Account> getAccounts() {
-        return accounts;
-    }
-
     public void register(Account account) {
-        accounts.put(account.getEmail(), account);
+        AccountDAO dao = new AccountDAO();
+
+        try {
+            dao.insert(account);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Account login(String email, String password) {
-        Account account = accounts.get(email);
+        Account account = AccountDAO.findByEmail(email);
+
         if (account == null) return null;
         String hash = hashPassword(password);
         if (account.getPasswordHash().equals(hash)) {

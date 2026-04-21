@@ -5,8 +5,9 @@ public class AccountEmpresa extends Account {
 
     public AccountEmpresa(String accountNumber, String name, String email,
                           String passwordHash, String cnpj) {
-        super(accountNumber, name, email, passwordHash);
+        super(accountNumber, name, email, passwordHash, cnpj, "e");
         this.cnpj = cnpj;
+        this.accountType = "e";
     }
 
     public String getCnpj() { return cnpj; }

@@ -108,7 +108,6 @@ public class Main {
                             }
 
                             authService.register(acc);
-                            accountMap.put(acc.getAccountNumber(), acc);
                             System.out.println("Conta registrada! Número: " + acc.getAccountNumber());
                         } catch (ValidationException ve) {
                             System.out.println(ve.getMessage());
@@ -382,11 +381,6 @@ public class Main {
             sc.close();
         }
 
-        // Requisito: criação/atualização de arquivos texto a partir de ArrayList/HashMap
-        fileExportService.salvarOperacoesEmArquivo(operacoes, "operacoes.txt");
-        fileExportService.salvarTransferenciasEmArquivo(transferencias, "transferencias.txt");
-        fileExportService.salvarContasEmArquivo(accountMap, "contas.txt");
-
-        System.out.println("Aplicação encerrada. Arquivos gerados.");
+        System.out.println("Aplicação encerrada.");
     }
 }

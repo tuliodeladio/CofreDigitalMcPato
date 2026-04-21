@@ -1,13 +1,17 @@
 package dao;
 
+import factory.ConnectionFactory;
+import model.Account;
 import model.AccountPessoaFisica;
+import model.AccountEmpresa;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AccountDAO {
 
-    public void insert(AccountPessoaFisica acc) {
+    public void insert(Account acc) throws SQLException {
         String sql = "INSERT INTO account VALUES (?,?,?,?,?,?,?)";
 
         try (Connection con = ConnectionFactory.getConnection();
@@ -18,8 +22,8 @@ public class AccountDAO {
             ps.setString(3, acc.getEmail());
             ps.setString(4, acc.getPasswordHash());
             ps.setDouble(5, acc.getBalance());
-            ps.setString(6, "f");
-            ps.setString(7, acc.getCpf());
+            ps.setString(6, acc.getAccountType());
+            ps.setString(7, acc.getDocumentNumber());
 
             ps.executeUpdate();
 
@@ -86,5 +90,38 @@ public class AccountDAO {
         }
 
         return lista;
+    }
+
+    public static Account findByEmail(String email) {
+        String sql = "SELECT * FROM account WHERE acc_email = ?";
+        Account acc = null;
+
+        try(
+            Connection con = ConnectionFactory.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                acc = mapAccount(rs, email);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return acc;
+    }
+
+    public static Account mapAccount(ResultSet rs, String email) throws SQLException {
+        String account_type = rs.getString("acc_type");
+        String account_number = rs.getString("acc_number");
+        String name = rs.getString("acc_name");
+        String pwd_hash = rs.getString("acc_password_hash");
+        String doc_number = rs.getString("acc_document_number");
+
+        return account_type.equalsIgnoreCase("f")
+            ? new AccountPessoaFisica(account_number, name, email, pwd_hash, doc_number)
+            : new AccountEmpresa(account_number, name, email, pwd_hash, doc_number);
     }
 }
