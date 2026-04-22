@@ -2,6 +2,7 @@ package service;
 
 import dao.TransferDAO;
 import model.Account;
+import model.AccountAsset;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -44,21 +45,22 @@ public class TransferService {
         System.out.println("Depósito realizado!");
     }
 
-    public void transfer(Account contaOrigem, Account contaDestino, String symbol, double quantity) {
+    public void transfer(Account contaOrigem, Account contaDestino, AccountAsset asset, double quantity) {
+        String assetSymbol = asset.getAssetSymbol();
+        double qtdOrigem = asset.getQuantity();
 
-        double qtdOrigem = contaOrigem.getAsset(symbol);
         if (qtdOrigem < quantity) {
             System.out.println("A conta não possui ativos suficientes para esta transferência!");
             return;
         }
 
-        contaOrigem.removeAsset(symbol, quantity);
-        contaDestino.addAsset(symbol, quantity);
+        contaOrigem.removeAsset(assetSymbol, quantity);
+        contaDestino.addAsset(assetSymbol, quantity);
 
         adicionarTransferencia(
             contaOrigem.getAccountNumber(),
             contaDestino.getAccountNumber(),
-            symbol,
+            assetSymbol,
             quantity,
             0.00,
             "TRANSFER_ATIVO");
