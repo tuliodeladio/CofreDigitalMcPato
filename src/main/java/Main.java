@@ -1,3 +1,4 @@
+import dao.AccountAssetDAO;
 import dao.AccountDAO;
 import record.*;
 import model.*;
@@ -32,10 +33,6 @@ public class Main {
 
         // Requisito: ArrayList com pelo menos 2 classes
         List<record.Transfer> transferencias = new ArrayList<>();
-
-        // Requisito: HashMap com pelo menos 2 classes
-        Map<String, Account> accountMap = new HashMap<>();
-        Map<String, Asset> assetMap = new HashMap<>();
 
         Account currentUser = null;
         boolean isAuthenticated = false;
@@ -245,6 +242,7 @@ public class Main {
                             case 3:
                                 AccountDAO accountDAO = new AccountDAO();
                                 List<Account> allAccounts = accountDAO.listAll();
+                                String currentUserAccountNumber = currentUser.getAccountNumber();
 
                                 if (allAccounts.size() <= 1) {
                                     System.out.println("Não há outras contas cadastradas para transferir.");
@@ -266,20 +264,25 @@ public class Main {
 
                                     if (contaDestinoObj == null ||
                                             contaDestinoObj.getAccountNumber()
-                                                    .equals(currentUser.getAccountNumber())) {
+                                                    .equals(currentUserAccountNumber)) {
                                         System.out.println("Conta de destino não encontrada ou inválida!");
                                         break;
                                     }
 
                                     System.out.println("Ativos disponíveis para transferência:");
-                                    for (String sym : assetMap.keySet()) {
-                                        System.out.println(sym + " - " + assetMap.get(sym).getName());
+                                    AccountAssetDAO accountAssetDao = new AccountAssetDAO();
+                                    List<AccountAsset> accountAssets = accountAssetDao.listAllByAccount(currentUserAccountNumber);
+
+                                    for (AccountAsset asset : accountAssets) {
+                                        System.out.println(asset.getAssetSymbol() + " - " + asset.getAssetName() + " - " + asset.getQuantity());
                                     }
 
                                     System.out.print("Escolha o ativo: ");
-                                    String ativoTransf = sc.nextLine().toUpperCase();
+                                    String ativoTransf = sc.nextLine().toUpperCase().trim();
 
-                                    if (!assetMap.containsKey(ativoTransf)) {
+                                    AccountAsset ativoSelec = accountAssets.stream().filter(a -> a.getAssetSymbol().trim().equals(ativoTransf)).findFirst().orElse(null);
+
+                                    if (ativoSelec == null) {
                                         System.out.println("Ativo não existente.");
                                         break;
                                     }
@@ -291,8 +294,8 @@ public class Main {
                                         break;
                                     }
 
-                                    TransferValidator.validateTransfer(currentUser, contaDestinoObj, ativoTransf, qtdTransf);
-                                    transferService.transfer(currentUser, contaDestinoObj, ativoTransf, qtdTransf);
+                                    TransferValidator.validateTransfer(currentUser, contaDestinoObj, ativoSelec, qtdTransf);
+                                    transferService.transfer(currentUser, contaDestinoObj, ativoSelec, qtdTransf);
 
                                 } catch (ValidationException ve) {
                                     System.out.println(ve.getMessage());
