@@ -49,23 +49,35 @@ public abstract class Account {
         return asset != null ? asset.getQuantity() : 0.0;
     }
 
-    public void addAsset(AccountAsset asset, double quantity) {
+    public void addAsset(String assetSymbol, double quantity) {
         AccountAssetDAO dao = new AccountAssetDAO();
+        AccountAsset accountAsset = dao.findAccountAsset(this.accountNumber, assetSymbol);
 
-        double qtdAtual = asset.getQuantity();
-        asset.setQuantity(qtdAtual + quantity);
-
-        dao.update(asset);
+        if (accountAsset == null) {
+            accountAsset = new AccountAsset(this.accountNumber, assetSymbol, quantity);
+            dao.insert(accountAsset);
+        } else {
+            accountAsset.setQuantity(accountAsset.getQuantity() + quantity);
+            dao.update(accountAsset);
+        }
     }
 
-    public void removeAsset(AccountAsset asset, double quantity) {
-        double qtdAtual = asset.getQuantity();
+    public void removeAsset(String assetSymbol, double quantity) {
+        AccountAssetDAO dao = new AccountAssetDAO();
+        AccountAsset accountAsset = dao.findAccountAsset(this.accountNumber, assetSymbol);
 
-        if (qtdAtual >= quantity) {
-            AccountAssetDAO dao = new AccountAssetDAO();
+        double qtdAtual = accountAsset == null ? 0.0 : accountAsset.getQuantity();
 
-            asset.setQuantity(qtdAtual - quantity);
-            dao.update(asset);
+        if ((accountAsset != null) && (qtdAtual >= quantity) && (quantity > 0)) {
+            accountAsset.setQuantity(qtdAtual - quantity);
+
+            if (accountAsset.getQuantity() == 0) {
+                dao.delete(accountAsset);
+            } else {
+                dao.update(accountAsset);
+            }
+        } else {
+            System.out.println("A conta não possui ativos suficientes para esta transferência!");
         }
     }
 }
