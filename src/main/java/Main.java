@@ -30,9 +30,6 @@ public class Main {
         TransferService transferService = new TransferService();
         ReportService reportService = new ReportService();
 
-        // Requisito: ArrayList com pelo menos 2 classes
-        List<record.Transfer> transferencias = new ArrayList<>();
-
         Account currentUser = null;
         boolean isAuthenticated = false;
 
@@ -324,7 +321,6 @@ public class Main {
                                 currentUser.getAccountNumber(),
                                 minhasOps,
                                 currentUser.getBalance(),
-                                currentUser.getWallet(),
                                 minhasTransfs
                         );
                         break;

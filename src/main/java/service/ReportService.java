@@ -1,17 +1,16 @@
 package service;
 
-import model.Account;
+import dao.AccountAssetDAO;
+import model.AccountAsset;
 import model.Operation;
-import model.Transfer;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 public class ReportService {
 
     public void printReport(String accountNumber, List<Operation> operacoes,
-                            double saldo, Map<String, Double> wallet,
-                            List<record.Transfer> transferencias) {
+                            double saldo, List<record.Transfer> transferencias) {
 
         System.out.println("\n=== RELATÓRIO COFRE DIGITAL McPATO ===");
         System.out.println("Conta: " + accountNumber);
@@ -19,14 +18,14 @@ public class ReportService {
         System.out.println("\nCARTEIRA DE CRIPTOATIVOS:");
 
         // Carteira
-        if (wallet.isEmpty()) {
+        AccountAssetDAO accountAssetDao = new AccountAssetDAO();
+        List<AccountAsset> accountAssets = accountAssetDao.listAllByAccount(accountNumber);
+
+        if (accountAssets.isEmpty()) {
             System.out.println("  Nenhuma posição");
         } else {
-            for (Map.Entry<String, Double> entry : wallet.entrySet()) {
-                if (entry.getValue() > 0) {
-                    System.out.println("  " + entry.getKey() + ": " +
-                            String.format("%.6f", entry.getValue()));
-                }
+            for (AccountAsset a : accountAssets) {
+                System.out.println("  " + a.getAssetSymbol() + ": " + String.format("%.6f", a.getQuantity()));
             }
         }
 
@@ -35,15 +34,16 @@ public class ReportService {
         if (operacoes.isEmpty()) {
             System.out.println("  Nenhuma operação");
         } else {
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
             for (Operation op : operacoes) {
-                // ✅ CORRIGIDO: getDateTime() ao invés de getDate()
                 System.out.printf("  %s %s %.6f %s (R$ %.2f) - %s%n",
                         op.getTypeCode(),
                         op.getSymbol(),
                         op.getQuantity(),
                         op.getTypeCode().equals("B") ? "COMPRA" : "VENDA",
                         op.getPrice(),
-                        op.getDateTime().toString()  // ← CORRETO
+                        op.getDateTime().format(formato)
                 );
             }
         }
