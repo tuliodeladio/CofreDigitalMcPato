@@ -42,19 +42,30 @@ public abstract class Account {
     }
 
     public Map<String, Double> getWallet() { return wallet; }
-    public double getAsset(String symbol) {
+    public double getAssetQuantity(String symbol) {
         AccountAssetDAO dao = new AccountAssetDAO();
         AccountAsset asset = dao.findAccountAsset(this.accountNumber, symbol);
 
         return asset != null ? asset.getQuantity() : 0.0;
     }
-    public void addAsset(String symbol, double quantity) {
-        wallet.put(symbol, wallet.getOrDefault(symbol, 0.0) + quantity);
+
+    public void addAsset(AccountAsset asset, double quantity) {
+        AccountAssetDAO dao = new AccountAssetDAO();
+
+        double qtdAtual = asset.getQuantity();
+        asset.setQuantity(qtdAtual + quantity);
+
+        dao.update(asset);
     }
-    public void removeAsset(String symbol, double quantity) {
-        double qtdAtual = wallet.getOrDefault(symbol, 0.0);
+
+    public void removeAsset(AccountAsset asset, double quantity) {
+        double qtdAtual = asset.getQuantity();
+
         if (qtdAtual >= quantity) {
-            wallet.put(symbol, qtdAtual - quantity);
+            AccountAssetDAO dao = new AccountAssetDAO();
+
+            asset.setQuantity(qtdAtual - quantity);
+            dao.update(asset);
         }
     }
 }
