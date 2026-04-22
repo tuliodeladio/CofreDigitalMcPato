@@ -71,8 +71,8 @@ public class TransferService {
         return dao.listByAccount(accountNumber);
     }
 
-    private record.Transfer adicionarTransferencia(String fromAccount, String toAccount, String symbol, Double quantity, Double amount, String type) {
-        record.Transfer transferencia = new record.Transfer(
+    private void adicionarTransferencia(String fromAccount, String toAccount, String symbol, Double quantity, Double amount, String type) {
+        record.Transfer transfer = new record.Transfer(
             System.currentTimeMillis(),
             fromAccount,
             toAccount,
@@ -84,8 +84,6 @@ public class TransferService {
         );
 
         TransferDAO dao = new TransferDAO();
-        dao.insert(transferencia);
-
-        return transferencia;
+        dao.insert(transfer);
     }
 }
