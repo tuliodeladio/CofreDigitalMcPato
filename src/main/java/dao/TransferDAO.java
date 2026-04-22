@@ -45,7 +45,6 @@ public class TransferDAO {
             ps.setString(2, accountNumber);
 
             ResultSet rs = ps.executeQuery();
-            LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
 
             while (rs.next()) {
                 Transfer transfer = new Transfer(
@@ -56,7 +55,7 @@ public class TransferDAO {
                     rs.getDouble("quantity"),
                     rs.getDouble("transfer_value"),
                     rs.getString("transfer_type"),
-                    createdAt
+                    rs.getTimestamp("created_at").toLocalDateTime()
                 );
 
                 lista.add(transfer);
