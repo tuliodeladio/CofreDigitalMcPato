@@ -27,17 +27,8 @@ public class OperationService {
             System.out.println("Saldo insuficiente!");
         }
 
-        AccountAssetDAO dao = new AccountAssetDAO();
-        AccountAsset accountAsset = dao.findAccountAsset(accountNumber, sym);
-
-        if (accountAsset == null) {
-            accountAsset = new AccountAsset(accountNumber, sym, quantity);
-        } else {
-            accountAsset.setQuantity(accountAsset.getQuantity() + quantity);
-        }
-
         // Upsert em Account Asset
-        accountAssetUpsert(accountAsset);
+        account.addAsset(sym, quantity);
 
         // Registra a operação no banco de dados
         adicionarOperacao(accountNumber, sym, quantity, price, Operation.Type.BUY);
@@ -62,9 +53,8 @@ public class OperationService {
             return;
         }
 
-        // Upsert em Account Asset
-        accountAsset.setQuantity(qtdAtual - quantity);
-        accountAssetUpsert(accountAsset);
+        // Atualiza (ou remove) Account Asset
+        account.removeAsset(sym, quantity);
 
         // Atualiza carteira
         double totalValue = price * quantity;
