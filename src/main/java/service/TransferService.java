@@ -54,8 +54,8 @@ public class TransferService {
             return;
         }
 
-        contaOrigem.removeAsset(asset, quantity);
-        contaDestino.addAsset(asset, quantity);
+        contaOrigem.removeAsset(assetSymbol, quantity);
+        contaDestino.addAsset(assetSymbol, quantity);
 
         adicionarTransferencia(
             contaOrigem.getAccountNumber(),
