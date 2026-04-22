@@ -12,7 +12,7 @@ public class AssetOperationValidator {
     public static void validateSell(Account acc, Asset asset, double amount) {
         if (acc == null || asset == null || amount <= 0)
             throw new ValidationException("Dados inválidos para venda!");
-        if (acc.getAsset(asset.getSymbol()) < amount)
+        if (acc.getAssetQuantity(asset.getSymbol()) < amount)
             throw new ValidationException("Quantidade insuficiente do ativo para venda!");
     }
 }
