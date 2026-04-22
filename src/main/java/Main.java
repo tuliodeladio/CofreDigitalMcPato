@@ -1,6 +1,5 @@
 import dao.AccountAssetDAO;
 import dao.AccountDAO;
-import record.*;
 import model.*;
 import service.*;
 import validator.*;
@@ -154,7 +153,7 @@ public class Main {
 
                         for (Asset a : assets) {
                             String sym = a.getSymbol();
-                            double qtd = currentUser.getAsset(sym);
+                            double qtd = currentUser.getAssetQuantity(sym);
 
                             if (qtd > 0) {
                                 System.out.println(sym + ": " + String.format("%.6f", qtd));
