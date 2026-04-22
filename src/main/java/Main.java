@@ -262,7 +262,7 @@ public class Main {
                                 try {
                                     System.out.print("Digite o número da conta destino: ");
                                     String contaDest = sc.nextLine().trim();
-                                    Account contaDestinoObj = allAccounts.get(contaDest);
+                                    Account contaDestinoObj = allAccounts.stream().filter(a -> a.getAccountNumber().trim().equals(contaDest)).findFirst().orElse(null);
 
                                     if (contaDestinoObj == null ||
                                             contaDestinoObj.getAccountNumber()
