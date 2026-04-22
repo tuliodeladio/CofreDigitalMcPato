@@ -64,25 +64,16 @@ public class AccountDAO {
         }
     }
 
-    public List<AccountPessoaFisica> listAll() {
-        List<AccountPessoaFisica> lista = new ArrayList<>();
-
-        String sql = "SELECT * FROM account WHERE acc_type = 'f'";
+    public List<Account> listAll() {
+        List<Account> lista = new ArrayList<>();
+        String sql = "SELECT * FROM account";
 
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                AccountPessoaFisica acc = new AccountPessoaFisica(
-                        rs.getString("acc_number"),
-                        rs.getString("acc_name"),
-                        rs.getString("acc_email"),
-                        rs.getString("acc_password_hash"),
-                        rs.getString("acc_document_number")
-                );
-
-                lista.add(acc);
+                lista.add(mapAccount(rs));
             }
 
         } catch (Exception e) {
@@ -104,7 +95,7 @@ public class AccountDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                acc = mapAccount(rs, email);
+                acc = mapAccount(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -113,12 +104,13 @@ public class AccountDAO {
         return acc;
     }
 
-    public static Account mapAccount(ResultSet rs, String email) throws SQLException {
+    public static Account mapAccount(ResultSet rs) throws SQLException {
         String account_type = rs.getString("acc_type");
         String account_number = rs.getString("acc_number");
         String name = rs.getString("acc_name");
         String pwd_hash = rs.getString("acc_password_hash");
         String doc_number = rs.getString("acc_document_number");
+        String email = rs.getString("acc_email");
 
         return account_type.equalsIgnoreCase("f")
             ? new AccountPessoaFisica(account_number, name, email, pwd_hash, doc_number)
