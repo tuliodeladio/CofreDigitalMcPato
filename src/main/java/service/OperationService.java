@@ -29,13 +29,15 @@ public class OperationService {
 
         AccountAssetDAO dao = new AccountAssetDAO();
         AccountAsset accountAsset = dao.findAccountAsset(accountNumber, sym);
-        double qtdAtual = accountAsset != null ? accountAsset.getQuantity() : account.getAsset(sym);
+
+        if (accountAsset == null) {
+            accountAsset = new AccountAsset(accountNumber, sym, quantity);
+        } else {
+            accountAsset.setQuantity(accountAsset.getQuantity() + quantity);
+        }
 
         // Upsert em Account Asset
-        accountAssetUpsert(accountNumber, sym, qtdAtual + quantity);
-
-        // Atualiza carteira
-        account.addAsset(sym, quantity);
+        accountAssetUpsert(accountAsset);
 
         // Registra a operação no banco de dados
         adicionarOperacao(accountNumber, sym, quantity, price, Operation.Type.BUY);
@@ -52,15 +54,17 @@ public class OperationService {
 
         AccountAssetDAO dao = new AccountAssetDAO();
         AccountAsset accountAsset = dao.findAccountAsset(accountNumber, sym);
-        double qtdAtual = accountAsset != null ? accountAsset.getQuantity() : account.getAsset(sym);
 
-        if (qtdAtual < quantity) {
+        double qtdAtual = accountAsset == null ? 0.0 : accountAsset.getQuantity();
+
+        if ((qtdAtual == 0.0) || (qtdAtual < quantity)) {
             System.out.println("Você não possui quantidade suficiente do ativo!");
             return;
         }
 
         // Upsert em Account Asset
-        accountAssetUpsert(accountNumber, sym, qtdAtual - quantity);
+        accountAsset.setQuantity(qtdAtual - quantity);
+        accountAssetUpsert(accountAsset);
 
         // Atualiza carteira
         double totalValue = price * quantity;
@@ -93,19 +97,17 @@ public class OperationService {
         dao.insert(operacao);
     }
 
-    private void accountAssetUpsert(String accountNumber, String assetSymbol, double quantity) {
+    private void accountAssetUpsert(AccountAsset accountAsset) {
         AccountAssetDAO accountAssetDAO = new AccountAssetDAO();
-        AccountAsset accountAsset = accountAssetDAO.findAccountAsset(accountNumber, assetSymbol);
 
-        if (accountAsset != null) {
-            if (quantity == 0) {
+        if (accountAsset == null) {
+            accountAssetDAO.insert(accountAsset);
+        } else {
+            if (accountAsset.getQuantity() == 0) {
                 accountAssetDAO.delete(accountAsset);
             } else {
-                accountAsset.setQuantity(quantity);
                 accountAssetDAO.update(accountAsset);
             }
-        } else {
-            accountAssetDAO.insert(new AccountAsset(accountNumber, assetSymbol, quantity));
         }
 
     }
