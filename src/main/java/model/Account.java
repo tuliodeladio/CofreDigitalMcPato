@@ -53,6 +53,7 @@ public abstract class Account {
         AccountAssetDAO dao = new AccountAssetDAO();
         AccountAsset accountAsset = dao.findAccountAsset(this.accountNumber, assetSymbol);
 
+        // Se o usuário já possui o asset, atualiza a quantidade, caso contrário, insere um novo registro.
         if (accountAsset == null) {
             accountAsset = new AccountAsset(this.accountNumber, assetSymbol, quantity);
             dao.insert(accountAsset);
@@ -66,8 +67,13 @@ public abstract class Account {
         AccountAssetDAO dao = new AccountAssetDAO();
         AccountAsset accountAsset = dao.findAccountAsset(this.accountNumber, assetSymbol);
 
+        // Se o asset não existe no banco, a quantidade atual é definida como 0.
+        // Assim a condicional a seguir não é satisfeita e o erro é reportado.
         double qtdAtual = accountAsset == null ? 0.0 : accountAsset.getQuantity();
 
+        // Para remover o asset, ele precisa existir no banco, e a quantidade a ser removida precisa ser:
+        //   - maior que 0
+        //   - menor ou igual à quantidade atual
         if ((accountAsset != null) && (qtdAtual >= quantity) && (quantity > 0)) {
             accountAsset.setQuantity(qtdAtual - quantity);
 
@@ -77,7 +83,7 @@ public abstract class Account {
                 dao.update(accountAsset);
             }
         } else {
-            System.out.println("A conta não possui ativos suficientes para esta transferência!");
+            System.out.println("A conta não possui ativos suficientes para esta operação!");
         }
     }
 }
