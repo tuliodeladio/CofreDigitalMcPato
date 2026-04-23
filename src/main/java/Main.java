@@ -30,8 +30,11 @@ public class Main {
         TransferService transferService = new TransferService();
         ReportService reportService = new ReportService();
 
+        AccountAssetDAO accountAssetDao = new AccountAssetDAO();
+
         Account currentUser = null;
         boolean isAuthenticated = false;
+        List<AccountAsset> accountAssets;
 
         try {
             while (true) {
@@ -142,21 +145,17 @@ public class Main {
                             break;
                         }
 
-                        assetService.updateAssets();
-                        List<Asset> assets = assetService.getAssets();
-
                         System.out.println("Seu saldo: R$ " + String.format("%.2f", currentUser.getBalance()));
                         System.out.println("Seus ativos:");
 
-                        for (Asset a : assets) {
-                            String sym = a.getSymbol();
-                            double qtd = currentUser.getAssetQuantity(sym);
-
-                            if (qtd > 0) {
-                                System.out.println(sym + ": " + String.format("%.6f", qtd));
-                            }
+                        accountAssets = accountAssetDao.listAllByAccount(currentUser.getAccountNumber());
+                        for (AccountAsset a : accountAssets) {
+                            System.out.println(a.getAssetSymbol() + ": " + String.format("%.6f", a.getQuantity()));
                         }
 
+                        // Atualiza os preços dos ativos antes de carregá-los
+                        assetService.updateAssets();
+                        List<Asset> assets = assetService.getAssets();
                         System.out.println("\nAtivos disponíveis:");
                         for (Asset a : assets) {
                             System.out.println(a.getSymbol() + " - " + a.getName() + " R$ " + String.format("%.2f", a.getCurrentValue()));
@@ -247,7 +246,7 @@ public class Main {
 
                                 System.out.println("Contas disponíveis para transferência:");
                                 for (Account acc : allAccounts) {
-                                    if (!acc.getAccountNumber().equals(currentUser.getAccountNumber())) {
+                                    if (!acc.getAccountNumber().equals(currentUserAccountNumber)) {
                                         System.out.println("Nome: " + acc.getName()
                                                 + " | Conta: " + acc.getAccountNumber());
                                     }
@@ -266,8 +265,7 @@ public class Main {
                                     }
 
                                     System.out.println("Ativos disponíveis para transferência:");
-                                    AccountAssetDAO accountAssetDao = new AccountAssetDAO();
-                                    List<AccountAsset> accountAssets = accountAssetDao.listAllByAccount(currentUserAccountNumber);
+                                    accountAssets = accountAssetDao.listAllByAccount(currentUserAccountNumber);
 
                                     for (AccountAsset asset : accountAssets) {
                                         System.out.println(asset.getAssetSymbol() + " - " + asset.getAssetName() + " - " + asset.getQuantity());
