@@ -1,9 +1,9 @@
 package model;
 
 import dao.AccountAssetDAO;
+import dao.AccountDAO;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public abstract class Account {
     protected String accountNumber;
@@ -13,17 +13,19 @@ public abstract class Account {
     protected String email;
     protected String passwordHash;
     protected double balance;
-    protected Map<String, Double> wallet;
+    protected List<AccountAsset> wallet;
 
-    public Account(String accountNumber, String name, String email, String passwordHash, String documentNumber, String accountType) {
+    public Account(String accountNumber, String name, String email, String passwordHash, String documentNumber, String accountType, double balance) {
         this.accountNumber = accountNumber;
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
-        this.balance = 0.0;
-        this.wallet = new HashMap<>();
+        this.balance = balance;
         this.documentNumber = documentNumber;
         this.accountType = accountType;
+
+        AccountAssetDAO dao = new AccountAssetDAO();
+        this.wallet = dao.listAllByAccount(accountNumber);
     }
 
     public String getAccountNumber() { return accountNumber; }
@@ -34,14 +36,25 @@ public abstract class Account {
     public String getPasswordHash() { return passwordHash; }
     public double getBalance() { return balance; }
 
-    public void deposit(double amount) { balance += amount; }
+    public void deposit(double amount) {
+        balance += amount;
+
+        AccountDAO dao = new AccountDAO();
+        dao.updateBalance(accountNumber, balance);
+    }
+
     public boolean withdraw(double amount) {
         if (amount > balance) return false;
         balance -= amount;
+
+        AccountDAO dao = new AccountDAO();
+        dao.updateBalance(accountNumber, balance);
+
         return true;
     }
 
-    public Map<String, Double> getWallet() { return wallet; }
+    public List<AccountAsset> getWallet() { return wallet; }
+
     public double getAssetQuantity(String symbol) {
         AccountAssetDAO dao = new AccountAssetDAO();
         AccountAsset asset = dao.findAccountAsset(this.accountNumber, symbol);
