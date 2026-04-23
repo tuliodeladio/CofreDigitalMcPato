@@ -90,12 +90,12 @@ public class Main {
                                 System.out.print("CNPJ: ");
                                 String cnpj = sc.nextLine();
                                 UserValidator.validateCnpj(cnpj);
-                                acc = new AccountEmpresa(contaNum, nome, email, hash, cnpj);
+                                acc = new AccountEmpresa(contaNum, nome, email, hash, cnpj, 0.0);
                             } else {
                                 System.out.print("CPF: ");
                                 String cpf = sc.nextLine();
                                 UserValidator.validateCpf(cpf);
-                                acc = new AccountPessoaFisica(contaNum, nome, email, hash, cpf);
+                                acc = new AccountPessoaFisica(contaNum, nome, email, hash, cpf, 0.0);
                             }
 
                             authService.register(acc);

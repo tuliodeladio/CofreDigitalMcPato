@@ -16,7 +16,8 @@ public class TesteDB {
                 "Teste",
                 "teste@email.com",
                 "hash123",
-                "12345678900"
+                "12345678900",
+                0.0
         );
 
         try {
