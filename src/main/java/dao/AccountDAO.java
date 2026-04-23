@@ -104,6 +104,21 @@ public class AccountDAO {
         return acc;
     }
 
+    public void updateBalance(String accountNumber, double balance) {
+        String sql = "UPDATE account SET acc_balance = ? WHERE acc_number = ?";
+
+        try(Connection con = ConnectionFactory.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setDouble(1, balance);
+            ps.setString(2, accountNumber);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static Account mapAccount(ResultSet rs) throws SQLException {
         String account_type = rs.getString("acc_type");
         String account_number = rs.getString("acc_number");
@@ -111,9 +126,10 @@ public class AccountDAO {
         String pwd_hash = rs.getString("acc_password_hash");
         String doc_number = rs.getString("acc_document_number");
         String email = rs.getString("acc_email");
+        double balance = rs.getDouble("acc_balance");
 
         return account_type.equalsIgnoreCase("f")
-            ? new AccountPessoaFisica(account_number, name, email, pwd_hash, doc_number)
-            : new AccountEmpresa(account_number, name, email, pwd_hash, doc_number);
+            ? new AccountPessoaFisica(account_number, name, email, pwd_hash, doc_number, balance)
+            : new AccountEmpresa(account_number, name, email, pwd_hash, doc_number, balance);
     }
 }
