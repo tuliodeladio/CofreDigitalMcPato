@@ -2,8 +2,8 @@ package service;
 
 import model.Account;
 import model.AccountPessoaFisica;
-import model.Transfer;
 import record.Operation;
+import record.Transfer;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,14 +35,14 @@ public class FileExportService {
         try (PrintWriter out = new PrintWriter(new FileWriter(fileName, false))) {
             for (Transfer t : transferencias) {
                 out.printf("%d;%s;%s;%s;%s;%s;%s;%s%n",
-                        t.getId(),
-                        t.getFromAccount() != null ? t.getFromAccount() : "",
-                        t.getToAccount() != null ? t.getToAccount() : "",
-                        t.getSymbol() != null ? t.getSymbol() : "",
-                        t.getQuantity() != null ? String.format("%.4f", t.getQuantity()) : "",
-                        t.getAmount() != null ? String.format("%.2f", t.getAmount()) : "",
-                        t.getType(),
-                        t.getDateTime().toString()
+                        t.id(),
+                        t.fromAccount() != null ? t.fromAccount() : "",
+                        t.toAccount() != null ? t.toAccount() : "",
+                        t.symbol() != null ? t.symbol() : "",
+                        t.quantity() != null ? String.format("%.4f", t.quantity()) : "",
+                        t.amount() != null ? String.format("%.2f", t.amount()) : "",
+                        t.getTypeCode(),
+                        t.dateTime().toString()
                 );
             }
         } catch (IOException e) {
