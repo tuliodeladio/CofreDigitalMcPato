@@ -1,7 +1,7 @@
 package model;
 
 public class AccountPessoaFisica extends Account {
-    private String cpf;
+    private final String cpf;
 
     public AccountPessoaFisica(String accountNumber, String name, String email,
                                String passwordHash, String cpf, double balance) {

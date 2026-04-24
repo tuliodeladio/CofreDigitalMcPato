@@ -108,12 +108,12 @@ public class AssetDAO {
 
     public void updateAllPrices() {
         String sql = "UPDATE asset SET asset_current_value = asset_current_value * ?";
-        double fator = 1 + ((Math.random() - 0.5) * 0.05); // ±5%
+        double factor = 1 + ((Math.random() - 0.5) * 0.05); // ±5%
 
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setDouble(1, fator);
+            ps.setDouble(1, factor);
 
             ps.executeUpdate();
 

@@ -3,10 +3,10 @@ package model;
 import dao.AssetDAO;
 
 public class AccountAsset {
-  private String accountNumber;
-  private String assetSymbol;
+  private final String accountNumber;
+  private final String assetSymbol;
   private double quantity;
-  private String assetName;
+  private final String assetName;
 
   public AccountAsset(String accountNumber, String assetSymbol, double quantity) {
     this.accountNumber = accountNumber;
