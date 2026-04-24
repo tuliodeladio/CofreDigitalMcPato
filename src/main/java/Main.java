@@ -1,8 +1,8 @@
 import dao.AccountAssetDAO;
-import dao.AccountDAO;
 import model.*;
 import service.*;
 import validator.*;
+import view.menu.BuyAndSell;
 import view.menu.Transfer;
 
 import java.util.*;
@@ -141,64 +141,20 @@ public class Main {
 
                     case 3:
                         // Compra/Venda (mantida, agora com Operation/ArrayList)
-                        if (!isAuthenticated) {
+                        if (isAuthenticated) {
+                            BuyAndSell.menuHandler(currentUser, sc);
+                        } else {
                             System.out.println("Necessário login!");
-                            break;
                         }
 
-                        System.out.println("Seu saldo: R$ " + String.format("%.2f", currentUser.getBalance()));
-                        System.out.println("Seus ativos:");
-
-                        accountAssets = accountAssetDao.listAllByAccount(currentUser.getAccountNumber());
-                        for (AccountAsset a : accountAssets) {
-                            System.out.println(a.getAssetSymbol() + ": " + String.format("%.6f", a.getQuantity()));
-                        }
-
-                        // Atualiza os preços dos ativos antes de carregá-los
-                        assetService.updateAssets();
-                        List<Asset> assets = assetService.getAssets();
-                        System.out.println("\nAtivos disponíveis:");
-                        for (Asset a : assets) {
-                            System.out.println(a.getSymbol() + " - " + a.getName() + " R$ " + String.format("%.2f", a.getCurrentValue()));
-                        }
-
-                        try {
-                            System.out.print("Escolha o ativo (código): ");
-                            String ativo = sc.nextLine().toUpperCase();
-                            Asset assetSelecionado = assets.stream().filter(a -> a.getSymbol().equals(ativo)).findFirst().orElse(null);
-
-                            if (assetSelecionado == null) {
-                                System.out.println("Ativo não encontrado!");
-                                break;
-                            }
-
-                            System.out.print("Comprar ou Vender (C/V)? ");
-                            String tipoOp = sc.nextLine().toUpperCase();
-
-                            System.out.print("Quantidade: ");
-                            double qtd = Double.parseDouble(sc.nextLine());
-
-                            if ("C".equals(tipoOp)) {
-                                operationService.buyAsset(currentUser, assetSelecionado, qtd);
-                            } else if ("V".equals(tipoOp)) {
-                                operationService.sellAsset(currentUser, assetSelecionado, qtd);
-                            } else {
-                                System.out.println("Tipo de operação inválido.");
-                            }
-
-                        } catch (ValidationException ve) {
-                            System.out.println(ve.getMessage());
-                        } catch (NumberFormatException e) {
-                            System.out.println("Quantidade inválida.");
-                        }
                         break;
 
                     case 4:
                         // Transferências (grava e lê os registros de transferencias no banco de dados)
-                        if (!isAuthenticated) {
-                            System.out.println("Necessário login!");
+                        if (isAuthenticated) {
+                            Transfer.menuHandler(currentUser, sc);
                         } else {
-                            Transfer.menuOption(currentUser);
+                            System.out.println("Necessário login!");
                         }
 
                         break;
