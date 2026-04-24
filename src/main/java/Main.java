@@ -1,9 +1,7 @@
-import dao.AccountAssetDAO;
 import model.*;
 import service.*;
 import validator.*;
-import view.menu.BuyAndSell;
-import view.menu.Report;
+import view.menu.*;
 import view.menu.Transfer;
 
 import java.util.*;
@@ -24,9 +22,6 @@ public class Main {
         } else {
             sc = new Scanner(System.in);
         }
-
-        AuthService authService = new AuthService();
-        TwoFactorService twoFactorService = new TwoFactorService();
 
         Account currentUser = null;
         boolean isAuthenticated = false;
@@ -59,78 +54,19 @@ public class Main {
 
                 switch (op) {
                     case 1:
-                        // Registro PF/PJ (mantido)
-                        try {
-                            System.out.print("Pessoa Física ou Empresa (F/E)? ");
-                            String tipo = sc.nextLine().toUpperCase();
-
-                            System.out.print("Nome: ");
-                            String nome = sc.nextLine();
-
-                            System.out.print("Email: ");
-                            String email = sc.nextLine();
-
-                            System.out.print("Senha: ");
-                            String senha = sc.nextLine();
-
-                            UserValidator.validateEmail(email);
-                            UserValidator.validatePassword(senha);
-
-                            String hash = AuthService.hashPassword(senha);
-                            Random rand = new Random();
-                            String contaNum = String.format("%04d", rand.nextInt(10000));
-
-                            Account acc;
-                            if ("E".equals(tipo)) {
-                                System.out.print("CNPJ: ");
-                                String cnpj = sc.nextLine();
-                                UserValidator.validateCnpj(cnpj);
-                                acc = new AccountEmpresa(contaNum, nome, email, hash, cnpj, 0.0);
-                            } else {
-                                System.out.print("CPF: ");
-                                String cpf = sc.nextLine();
-                                UserValidator.validateCpf(cpf);
-                                acc = new AccountPessoaFisica(contaNum, nome, email, hash, cpf, 0.0);
-                            }
-
-                            authService.register(acc);
-                            System.out.println("Conta registrada! Número: " + acc.getAccountNumber());
-                        } catch (ValidationException ve) {
-                            System.out.println(ve.getMessage());
-                        }
+                        // Registro PF/PJ
+                        // Insere uma nova conta no banco de dados
+                        Register.handleMenu(sc);
                         break;
 
                     case 2:
                         // Login + 2FA (mantido)
-                        try {
-                            System.out.print("Email: ");
-                            String loginEmail = sc.nextLine();
+                        currentUser = Login.menuHandler(currentUser, sc);
 
-                            System.out.print("Senha: ");
-                            String loginSenha = sc.nextLine();
-
-                            UserValidator.validateEmail(loginEmail);
-                            UserValidator.validatePassword(loginSenha);
-
-                            Account loginAcc = authService.login(loginEmail, loginSenha);
-                            if (loginAcc != null) {
-                                twoFactorService.generateAndSendCode(loginEmail);
-                                System.out.print("Digite o código 2FA enviado: ");
-                                String inputCode = sc.nextLine();
-
-                                if (twoFactorService.validateCode(inputCode)) {
-                                    currentUser = loginAcc;
-                                    isAuthenticated = true;
-                                    System.out.println("Login realizado com sucesso!");
-                                } else {
-                                    System.out.println("2FA incorreto!");
-                                }
-                            } else {
-                                System.out.println("Credenciais inválidas!");
-                            }
-                        } catch (ValidationException ve) {
-                            System.out.println(ve.getMessage());
+                        if (currentUser != null) {
+                            isAuthenticated = true;
                         }
+
                         break;
 
                     case 3:
