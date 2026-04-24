@@ -28,8 +28,8 @@ public class AssetDAO {
         }
     }
 
+    // Só permite atualizar o valor do ativo
     public void update(Asset asset) {
-        // Nunca atualiza o nome e o símbolo do ativo
         String sql = "UPDATE asset SET asset_current_value = ? WHERE asset_symbol = ?";
 
         try (Connection con = ConnectionFactory.getConnection();
