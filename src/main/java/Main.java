@@ -3,6 +3,7 @@ import model.*;
 import service.*;
 import validator.*;
 import view.menu.BuyAndSell;
+import view.menu.Report;
 import view.menu.Transfer;
 
 import java.util.*;
@@ -25,17 +26,10 @@ public class Main {
         }
 
         AuthService authService = new AuthService();
-        AssetService assetService = new AssetService();
         TwoFactorService twoFactorService = new TwoFactorService();
-        OperationService operationService = new OperationService();
-        TransferService transferService = new TransferService();
-        ReportService reportService = new ReportService();
-
-        AccountAssetDAO accountAssetDao = new AccountAssetDAO();
 
         Account currentUser = null;
         boolean isAuthenticated = false;
-        List<AccountAsset> accountAssets;
 
         try {
             while (true) {
@@ -140,7 +134,8 @@ public class Main {
                         break;
 
                     case 3:
-                        // Compra/Venda (mantida, agora com Operation/ArrayList)
+                        // Compra/Venda
+                        // Grava e lê registros de operações de compra e venda, e atualiza o saldo da conta no banco de dados)
                         if (isAuthenticated) {
                             BuyAndSell.menuHandler(currentUser, sc);
                         } else {
@@ -150,7 +145,8 @@ public class Main {
                         break;
 
                     case 4:
-                        // Transferências (grava e lê os registros de transferencias no banco de dados)
+                        // Transferências
+                        // Grava e lê os registros de transferencias, saques e depósitos, e atualiza o saldo da conta no banco de dados
                         if (isAuthenticated) {
                             Transfer.menuHandler(currentUser, sc);
                         } else {
@@ -160,23 +156,14 @@ public class Main {
                         break;
 
                     case 5:
-                        // Relatório (mantido)
-                        if (!isAuthenticated) {
+                        // Relatório
+                        // Lê do banco de dados registros de transferências, operações, lista de ativos, saldo, etc
+                        if (isAuthenticated) {
+                            Report.menuHandler(currentUser);
+                        } else {
                             System.out.println("Necessário login!");
-                            break;
                         }
 
-                        List<Operation> minhasOps =
-                                operationService.listByAccount(currentUser.getAccountNumber());
-                        List<record.Transfer> minhasTransfs =
-                                transferService.listByUser(currentUser.getAccountNumber());
-
-                        reportService.printReport(
-                                currentUser.getAccountNumber(),
-                                minhasOps,
-                                currentUser.getBalance(),
-                                minhasTransfs
-                        );
                         break;
 
                     default:
