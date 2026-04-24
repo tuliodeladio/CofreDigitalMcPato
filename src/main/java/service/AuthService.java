@@ -2,14 +2,10 @@ package service;
 
 import java.security.MessageDigest;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import dao.AccountDAO;
 import model.Account;
 
 public class AuthService {
-    private final Map<String, Account> accounts = new HashMap<>();
-
     public void register(Account account) {
         AccountDAO dao = new AccountDAO();
 

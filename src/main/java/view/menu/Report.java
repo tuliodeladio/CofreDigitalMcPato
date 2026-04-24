@@ -2,6 +2,7 @@ package view.menu;
 
 import model.Account;
 import record.Operation;
+import record.Transfer;
 import service.OperationService;
 import service.ReportService;
 import service.TransferService;
@@ -15,7 +16,7 @@ public class Report {
         ReportService reportService = new ReportService();
 
         List<Operation> minhasOps = operationService.listByAccount(currentUser.getAccountNumber());
-        List<record.Transfer> minhasTransfs = transferService.listByUser(currentUser.getAccountNumber());
+        List<Transfer> minhasTransfs = transferService.listByUser(currentUser.getAccountNumber());
 
         reportService.printReport(
             currentUser.getAccountNumber(),

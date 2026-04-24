@@ -11,7 +11,7 @@ import java.util.List;
 public class ReportService {
 
     public void printReport(String accountNumber, List<Operation> operacoes,
-                            double saldo, List<record.Transfer> transferencias) {
+                            double saldo, List<Transfer> transferencias) {
 
         System.out.println("\n=== RELATÓRIO COFRE DIGITAL McPATO ===");
         System.out.println("Conta: " + accountNumber);
@@ -56,7 +56,7 @@ public class ReportService {
         if (transferencias.isEmpty()) {
             System.out.println("  Nenhuma transferência");
         } else {
-            for (record.Transfer t : transferencias) {
+            for (Transfer t : transferencias) {
                 Transfer.Type transferType = t.type();
 
                 if (transferType.equals(Transfer.Type.WITHDRAW)) {
@@ -64,7 +64,7 @@ public class ReportService {
                 } else if (transferType.equals(Transfer.Type.DEPOSIT)) {
                     System.out.println("  DEPÓSITO: R$ " + t.amount());
                 } else {
-                    System.out.println("  TRANSFERÊNCIA: " + t.symbol() + " " +
+                    System.out.println("  TRANSF.: " + t.symbol() + " " +
                             String.format("%.6f", t.quantity()) +
                             " → " + t.toAccount());
                 }

@@ -22,7 +22,7 @@ public class TransferDAO {
             ps.setString(4, transfer.symbol());
             ps.setDouble(5, transfer.quantity());
             ps.setDouble(6, transfer.amount());
-            ps.setObject(7, transfer.type());
+            ps.setObject(7, transfer.getTypeCode());
             ps.setObject(8, transfer.dateTime());
 
             ps.executeUpdate();
@@ -46,7 +46,6 @@ public class TransferDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Transfer.Type transferType = Transfer.Type.fromCode(rs.getString("transfer_type"));
 
                 Transfer transfer = new Transfer(
                     rs.getLong("id"),
@@ -55,7 +54,7 @@ public class TransferDAO {
                     rs.getString("asset_symbol"),
                     rs.getDouble("quantity"),
                     rs.getDouble("transfer_value"),
-                    transferType,
+                    Transfer.Type.fromCode(rs.getString("transfer_type")),
                     rs.getTimestamp("created_at").toLocalDateTime()
                 );
 

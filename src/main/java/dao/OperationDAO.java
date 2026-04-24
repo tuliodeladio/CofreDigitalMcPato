@@ -6,7 +6,6 @@ import record.Operation;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,17 +78,14 @@ public class OperationDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Operation.Type opType = Operation.Type.fromCode(rs.getString("operation_type"));
-                LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
-
                 Operation op = new Operation(
                     rs.getLong("id"),
                     rs.getString("account_number"),
                     rs.getString("asset_symbol"),
-                    opType,
+                    Operation.Type.fromCode(rs.getString("operation_type")),
                     rs.getDouble("quantity"),
                     rs.getDouble("price"),
-                    createdAt
+                    rs.getTimestamp("created_at").toLocalDateTime()
                 );
 
                 lista.add(op);

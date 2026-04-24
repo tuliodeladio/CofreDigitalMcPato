@@ -64,18 +64,19 @@ public class TransferService {
             assetSymbol,
             quantity,
             0.00,
-            Transfer.Type.ASSET_TRANSFER);
+            Transfer.Type.ASSET_TRANSFER
+        );
 
         System.out.println("Transferência realizada!");
     }
 
-    public List<record.Transfer> listByUser(String accountNumber) {
+    public List<Transfer> listByUser(String accountNumber) {
         TransferDAO dao = new TransferDAO();
         return dao.listByAccount(accountNumber);
     }
 
     private void adicionarTransferencia(String fromAccount, String toAccount, String symbol, Double quantity, Double amount, Transfer.Type transferType) {
-        record.Transfer transfer = new record.Transfer(
+        Transfer transfer = new Transfer(
             System.currentTimeMillis(),
             fromAccount,
             toAccount,
