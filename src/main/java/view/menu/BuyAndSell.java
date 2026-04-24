@@ -3,7 +3,7 @@ package view.menu;
 import dao.AccountAssetDAO;
 import model.Account;
 import model.AccountAsset;
-import model.Asset;
+import record.Asset;
 import service.AssetService;
 import service.OperationService;
 import validator.ValidationException;
@@ -30,13 +30,13 @@ public class BuyAndSell {
         List<Asset> assets = assetService.getAssets();
         System.out.println("\nAtivos disponíveis:");
         for (Asset a : assets) {
-            System.out.println(a.getSymbol() + " - " + a.getName() + " R$ " + String.format("%.2f", a.getCurrentValue()));
+            System.out.println(a.symbol() + " - " + a.name() + " R$ " + String.format("%.2f", a.currentValue()));
         }
 
         try {
             System.out.print("Escolha o ativo (código): ");
             String ativo = sc.nextLine().toUpperCase();
-            Asset assetSelecionado = assets.stream().filter(a -> a.getSymbol().equals(ativo)).findFirst().orElse(null);
+            Asset assetSelecionado = assets.stream().filter(a -> a.symbol().equals(ativo)).findFirst().orElse(null);
 
             if (assetSelecionado == null) {
                 System.out.println("Ativo não encontrado!");

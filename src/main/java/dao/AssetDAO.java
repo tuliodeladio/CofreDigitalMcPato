@@ -1,7 +1,7 @@
 package dao;
 
 import factory.ConnectionFactory;
-import model.Asset;
+import record.Asset;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,9 +17,9 @@ public class AssetDAO {
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, asset.getSymbol());
-            ps.setString(2, asset.getName());
-            ps.setDouble(3, asset.getCurrentValue());
+            ps.setString(1, asset.symbol());
+            ps.setString(2, asset.name());
+            ps.setDouble(3, asset.currentValue());
 
             ps.executeUpdate();
 
@@ -35,8 +35,8 @@ public class AssetDAO {
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setDouble(1, asset.getCurrentValue());
-            ps.setString(2, asset.getSymbol());
+            ps.setDouble(1, asset.currentValue());
+            ps.setString(2, asset.symbol());
 
             ps.executeUpdate();
 

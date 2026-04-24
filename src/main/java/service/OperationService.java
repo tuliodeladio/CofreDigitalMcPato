@@ -4,7 +4,7 @@ import dao.AccountAssetDAO;
 import dao.OperationDAO;
 import model.Account;
 import model.AccountAsset;
-import model.Asset;
+import record.Asset;
 import record.Operation;
 import validator.AssetOperationValidator;
 
@@ -17,9 +17,9 @@ public class OperationService {
         AssetOperationValidator.validateBuy(account, asset, quantity);
 
         // Calcula custo total
-        double price = asset.getCurrentValue();
+        double price = asset.currentValue();
         double totalCost = price * quantity;
-        String sym = asset.getSymbol();
+        String sym = asset.symbol();
         String accountNumber = account.getAccountNumber();
 
         // Deduz da carteira
@@ -39,8 +39,8 @@ public class OperationService {
     public void sellAsset(Account account, Asset asset, double quantity) {
         AssetOperationValidator.validateSell(account, asset, quantity);
 
-        double price = asset.getCurrentValue();
-        String sym = asset.getSymbol();
+        double price = asset.currentValue();
+        String sym = asset.symbol();
         String accountNumber = account.getAccountNumber();
 
         AccountAssetDAO dao = new AccountAssetDAO();

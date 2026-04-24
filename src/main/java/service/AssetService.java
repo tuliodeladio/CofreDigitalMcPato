@@ -1,7 +1,7 @@
 package service;
 
 import dao.AssetDAO;
-import model.Asset;
+import record.Asset;
 import java.util.List;
 
 public class AssetService {

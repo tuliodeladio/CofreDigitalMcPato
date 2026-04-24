@@ -1,6 +1,7 @@
 package model;
 
 import dao.AssetDAO;
+import record.Asset;
 
 public class AccountAsset {
   private final String accountNumber;
@@ -14,7 +15,7 @@ public class AccountAsset {
     this.quantity = quantity;
 
     Asset asset = AssetDAO.findBySymbol(this.assetSymbol);
-    this.assetName = asset != null ? asset.getName() : null;
+    this.assetName = asset != null ? asset.name() : null;
   }
 
   public String getAccountNumber() { return accountNumber; }
