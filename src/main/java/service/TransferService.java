@@ -3,6 +3,7 @@ package service;
 import dao.TransferDAO;
 import model.Account;
 import model.AccountAsset;
+import record.Transfer;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -20,7 +21,7 @@ public class TransferService {
             null,
             0.00,
             valor,
-            "SAQUE"
+            Transfer.Type.WITHDRAW
         );
 
         System.out.println("Saque efetuado!");
@@ -40,7 +41,7 @@ public class TransferService {
             null,
             0.00,
             valor,
-            "DEPOSITO"
+            Transfer.Type.DEPOSIT
         );
         System.out.println("Depósito realizado!");
     }
@@ -63,7 +64,7 @@ public class TransferService {
             assetSymbol,
             quantity,
             0.00,
-            "TRANSFER_ATIVO");
+            Transfer.Type.ASSET_TRANSFER);
 
         System.out.println("Transferência realizada!");
     }
@@ -73,7 +74,7 @@ public class TransferService {
         return dao.listByAccount(accountNumber);
     }
 
-    private void adicionarTransferencia(String fromAccount, String toAccount, String symbol, Double quantity, Double amount, String type) {
+    private void adicionarTransferencia(String fromAccount, String toAccount, String symbol, Double quantity, Double amount, Transfer.Type transferType) {
         record.Transfer transfer = new record.Transfer(
             System.currentTimeMillis(),
             fromAccount,
@@ -81,7 +82,7 @@ public class TransferService {
             symbol,
             quantity,
             amount,
-            type,
+            transferType,
             LocalDateTime.now()
         );
 

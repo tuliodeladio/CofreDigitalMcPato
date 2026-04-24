@@ -6,7 +6,6 @@ import record.Transfer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +46,8 @@ public class TransferDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+                Transfer.Type transfer_type = Transfer.Type.fromCode(rs.getString("transfer_type"));
+
                 Transfer transfer = new Transfer(
                     rs.getLong("id"),
                     rs.getString("from_account"),
@@ -54,7 +55,7 @@ public class TransferDAO {
                     rs.getString("asset_symbol"),
                     rs.getDouble("quantity"),
                     rs.getDouble("transfer_value"),
-                    rs.getString("transfer_type"),
+                    transfer_type,
                     rs.getTimestamp("created_at").toLocalDateTime()
                 );
 

@@ -3,6 +3,7 @@ package service;
 import dao.AccountAssetDAO;
 import model.AccountAsset;
 import record.Operation;
+import record.Transfer;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -56,12 +57,14 @@ public class ReportService {
             System.out.println("  Nenhuma transferência");
         } else {
             for (record.Transfer t : transferencias) {
-                if (t.type().equals("SAQUE")) {
+                Transfer.Type transferType = t.type();
+
+                if (transferType.equals(Transfer.Type.WITHDRAW)) {
                     System.out.println("  SAQUE: R$ " + t.amount());
-                } else if (t.type().equals("DEPOSITO")) {
+                } else if (transferType.equals(Transfer.Type.DEPOSIT)) {
                     System.out.println("  DEPÓSITO: R$ " + t.amount());
                 } else {
-                    System.out.println("  TRANSFER: " + t.symbol() + " " +
+                    System.out.println("  TRANSFERÊNCIA: " + t.symbol() + " " +
                             String.format("%.6f", t.quantity()) +
                             " → " + t.toAccount());
                 }
