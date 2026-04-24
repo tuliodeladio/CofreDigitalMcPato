@@ -31,7 +31,7 @@ public class OperationService {
         account.addAsset(sym, quantity);
 
         // Registra a operação no banco de dados
-        adicionarOperacao(accountNumber, sym, quantity, price, Operation.Type.BUY);
+        adicionarOperacao(accountNumber, sym, quantity, totalCost, Operation.Type.BUY);
 
         System.out.println("Compra realizada!");
     }
@@ -61,7 +61,7 @@ public class OperationService {
         account.deposit(totalValue);
 
         // Registra a operação no banco de dados
-        adicionarOperacao(accountNumber, sym, quantity, price, Operation.Type.SELL);
+        adicionarOperacao(accountNumber, sym, quantity, totalValue, Operation.Type.SELL);
 
         System.out.println("Venda realizada! Valor creditado na conta.");
     }

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class TransferDAO {
     public void insert(Transfer transfer) {
-        String sql = "INSERT INTO transfer VALUES (?,?,?,?,?,?,?, ?)";
+        String sql = "INSERT INTO transfer VALUES (?,?,?,?,?,?,?,?)";
 
         try(Connection con = ConnectionFactory.getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {

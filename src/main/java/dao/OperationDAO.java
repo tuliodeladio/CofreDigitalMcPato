@@ -23,7 +23,7 @@ public class OperationDAO {
             ps.setString(3, operation.getSymbol());
             ps.setString(4, operation.getTypeCode());
             ps.setDouble(5, operation.getQuantity());
-            ps.setDouble(6, operation.getQuantity());
+            ps.setDouble(6, operation.getPrice());
             ps.setObject(7, operation.getDateTime());
 
             ps.executeUpdate();
@@ -43,7 +43,7 @@ public class OperationDAO {
             ps.setString(2, operation.getSymbol ());
             ps.setString(3, operation.getType().toString());
             ps.setDouble(4, operation.getQuantity());
-            ps.setDouble(5, operation.getQuantity());
+            ps.setDouble(5, operation.getPrice());
             ps.setLong(6, operation.getId());
 
             ps.executeUpdate();
