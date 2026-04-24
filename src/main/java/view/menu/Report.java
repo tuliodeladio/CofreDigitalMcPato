@@ -1,13 +1,12 @@
 package view.menu;
 
 import model.Account;
-import model.Operation;
+import record.Operation;
 import service.OperationService;
 import service.ReportService;
 import service.TransferService;
 
 import java.util.List;
-import java.util.Scanner;
 
 public class Report {
     public static void menuHandler(Account currentUser) {

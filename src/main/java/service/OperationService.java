@@ -5,7 +5,7 @@ import dao.OperationDAO;
 import model.Account;
 import model.AccountAsset;
 import model.Asset;
-import model.Operation;
+import record.Operation;
 import validator.AssetOperationValidator;
 
 import java.time.LocalDateTime;

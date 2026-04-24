@@ -2,8 +2,8 @@ package service;
 
 import model.Account;
 import model.AccountPessoaFisica;
-import model.Operation;
 import model.Transfer;
+import record.Operation;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,13 +17,13 @@ public class FileExportService {
         try (PrintWriter out = new PrintWriter(new FileWriter(fileName, false))) {
             for (Operation op : operacoes) {
                 out.printf("%d;%s;%s;%s;%.4f;%.2f;%s%n",
-                        op.getId(),
-                        op.getAccountNumber(),
-                        op.getSymbol(),
+                        op.id(),
+                        op.accountNumber(),
+                        op.symbol(),
                         op.getTypeCode(),
-                        op.getQuantity(),
-                        op.getPrice(),
-                        op.getDateTime().toString()
+                        op.quantity(),
+                        op.price(),
+                        op.dateTime().toString()
                 );
             }
         } catch (IOException e) {

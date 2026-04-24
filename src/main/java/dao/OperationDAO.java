@@ -1,12 +1,11 @@
 package dao;
 
 import factory.ConnectionFactory;
-import model.Operation;
+import record.Operation;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +17,13 @@ public class OperationDAO {
         try(Connection con = ConnectionFactory.getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setLong(1, operation.getId());
-            ps.setString(2, operation.getAccountNumber());
-            ps.setString(3, operation.getSymbol());
+            ps.setLong(1, operation.id());
+            ps.setString(2, operation.accountNumber());
+            ps.setString(3, operation.symbol());
             ps.setString(4, operation.getTypeCode());
-            ps.setDouble(5, operation.getQuantity());
-            ps.setDouble(6, operation.getPrice());
-            ps.setObject(7, operation.getDateTime());
+            ps.setDouble(5, operation.quantity());
+            ps.setDouble(6, operation.price());
+            ps.setObject(7, operation.dateTime());
 
             ps.executeUpdate();
 
@@ -39,12 +38,12 @@ public class OperationDAO {
         try(Connection con = ConnectionFactory.getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, operation.getAccountNumber());
-            ps.setString(2, operation.getSymbol ());
-            ps.setString(3, operation.getType().toString());
-            ps.setDouble(4, operation.getQuantity());
-            ps.setDouble(5, operation.getPrice());
-            ps.setLong(6, operation.getId());
+            ps.setString(1, operation.accountNumber());
+            ps.setString(2, operation.symbol ());
+            ps.setString(3, operation.type().toString());
+            ps.setDouble(4, operation.quantity());
+            ps.setDouble(5, operation.price());
+            ps.setLong(6, operation.id());
 
             ps.executeUpdate();
 
@@ -59,7 +58,7 @@ public class OperationDAO {
         try(Connection con = ConnectionFactory.getConnection();
             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setLong(1, operation.getId());
+            ps.setLong(1, operation.id());
 
             ps.executeUpdate();
 

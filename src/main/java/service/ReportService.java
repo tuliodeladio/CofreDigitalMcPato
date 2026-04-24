@@ -2,7 +2,7 @@ package service;
 
 import dao.AccountAssetDAO;
 import model.AccountAsset;
-import model.Operation;
+import record.Operation;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -37,13 +37,15 @@ public class ReportService {
             DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
             for (Operation op : operacoes) {
+                String typeCode = op.getTypeCode();
+
                 System.out.printf("  %s %s %.6f %s (R$ %.2f) - %s%n",
-                        op.getTypeCode(),
-                        op.getSymbol(),
-                        op.getQuantity(),
-                        op.getTypeCode().equals("B") ? "COMPRA" : "VENDA",
-                        op.getPrice(),
-                        op.getDateTime().format(formato)
+                        typeCode,
+                        op.symbol(),
+                        op.quantity(),
+                        typeCode.equals("B") ? "COMPRA" : "VENDA",
+                        op.price(),
+                        op.dateTime().format(formato)
                 );
             }
         }
