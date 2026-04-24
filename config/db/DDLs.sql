@@ -66,7 +66,8 @@ CREATE TABLE transfer (
     asset_symbol VARCHAR(10),
     quantity DECIMAL(18,6) DEFAULT 0,
     transfer_value DECIMAL(15,2) DEFAULT 0,
-    transfer_type VARCHAR(20)
+    transfer_type VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMENT ON COLUMN transfer.quantity IS 'quantity SE REFERE À QUANTIDADE DE COTAS';
