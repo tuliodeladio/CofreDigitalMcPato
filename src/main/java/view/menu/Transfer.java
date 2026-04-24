@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Transfer {
-    public static void menuOption(Account currentUser) {
-        Scanner sc = new Scanner(System.in);
+    public static void menuHandler(Account currentUser, Scanner sc) {
         TransferService transferService = new TransferService();
         AccountAssetDAO accountAssetDao = new AccountAssetDAO();
 
