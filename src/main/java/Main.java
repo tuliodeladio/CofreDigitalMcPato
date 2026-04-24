@@ -3,6 +3,7 @@ import dao.AccountDAO;
 import model.*;
 import service.*;
 import validator.*;
+import view.menu.Transfer;
 
 import java.util.*;
 import java.io.*;
@@ -193,114 +194,13 @@ public class Main {
                         break;
 
                     case 4:
-                        // Transferências (mantida, agora gravando Transfer em ArrayList)
+                        // Transferências (grava e lê os registros de transferencias no banco de dados)
                         if (!isAuthenticated) {
                             System.out.println("Necessário login!");
-                            break;
+                        } else {
+                            Transfer.menuOption(currentUser);
                         }
 
-                        System.out.println("Selecione a opção:");
-                        System.out.println("1. Saque");
-                        System.out.println("2. Depósito");
-                        System.out.println("3. Transferência de Ativo");
-                        System.out.print("Escolha: ");
-
-                        int transfOp;
-                        try {
-                            transfOp = Integer.parseInt(sc.nextLine());
-                        } catch (NumberFormatException e) {
-                            System.out.println("Opção inválida!");
-                            break;
-                        }
-
-                        switch (transfOp) {
-                            case 1:
-                                try {
-                                    System.out.print("Valor do saque (BRL): ");
-                                    double valorSaque = Double.parseDouble(sc.nextLine());
-                                    transferService.withdraw(currentUser, valorSaque);
-                                } catch (NumberFormatException e) {
-                                    System.out.println("Valor inválido.");
-                                }
-                                break;
-
-                            case 2:
-                                try {
-                                    System.out.print("Valor do depósito (BRL): ");
-                                    double valorDeposito = Double.parseDouble(sc.nextLine());
-                                    transferService.deposit(currentUser, valorDeposito);
-                                } catch (NumberFormatException e) {
-                                    System.out.println("Valor inválido.");
-                                }
-                                break;
-
-                            case 3:
-                                AccountDAO accountDAO = new AccountDAO();
-                                List<Account> allAccounts = accountDAO.listAll();
-                                String currentUserAccountNumber = currentUser.getAccountNumber();
-
-                                if (allAccounts.size() <= 1) {
-                                    System.out.println("Não há outras contas cadastradas para transferir.");
-                                    break;
-                                }
-
-                                System.out.println("Contas disponíveis para transferência:");
-                                for (Account acc : allAccounts) {
-                                    if (!acc.getAccountNumber().equals(currentUserAccountNumber)) {
-                                        System.out.println("Nome: " + acc.getName()
-                                                + " | Conta: " + acc.getAccountNumber());
-                                    }
-                                }
-
-                                try {
-                                    System.out.print("Digite o número da conta destino: ");
-                                    String contaDest = sc.nextLine().trim();
-                                    Account contaDestinoObj = allAccounts.stream().filter(a -> a.getAccountNumber().trim().equals(contaDest)).findFirst().orElse(null);
-
-                                    if (contaDestinoObj == null ||
-                                            contaDestinoObj.getAccountNumber()
-                                                    .equals(currentUserAccountNumber)) {
-                                        System.out.println("Conta de destino não encontrada ou inválida!");
-                                        break;
-                                    }
-
-                                    System.out.println("Ativos disponíveis para transferência:");
-                                    accountAssets = accountAssetDao.listAllByAccount(currentUserAccountNumber);
-
-                                    for (AccountAsset asset : accountAssets) {
-                                        System.out.println(asset.getAssetSymbol() + " - " + asset.getAssetName() + " - " + asset.getQuantity());
-                                    }
-
-                                    System.out.print("Escolha o ativo: ");
-                                    String ativoTransf = sc.nextLine().toUpperCase().trim();
-
-                                    AccountAsset ativoSelec = accountAssets.stream().filter(a -> a.getAssetSymbol().trim().equals(ativoTransf)).findFirst().orElse(null);
-
-                                    if (ativoSelec == null) {
-                                        System.out.println("Ativo não existente.");
-                                        break;
-                                    }
-
-                                    System.out.print("Quantidade: ");
-                                    double qtdTransf = Double.parseDouble(sc.nextLine());
-                                    if (qtdTransf <= 0) {
-                                        System.out.println("A quantidade deve ser positiva.");
-                                        break;
-                                    }
-
-                                    TransferValidator.validateTransfer(currentUser, contaDestinoObj, ativoSelec, qtdTransf);
-                                    transferService.transfer(currentUser, contaDestinoObj, ativoSelec, qtdTransf);
-
-                                } catch (ValidationException ve) {
-                                    System.out.println(ve.getMessage());
-                                } catch (NumberFormatException e) {
-                                    System.out.println("Quantidade inválida.");
-                                }
-                                break;
-
-                            default:
-                                System.out.println("Opção inválida na tela de transferências.");
-                        }
                         break;
 
                     case 5:
