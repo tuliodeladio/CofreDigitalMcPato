@@ -79,17 +79,17 @@ public class OperationDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Operation.Type op_type = Operation.Type.fromCode(rs.getString("operation_type"));
-                LocalDateTime created_at = rs.getTimestamp("created_at").toLocalDateTime();
+                Operation.Type opType = Operation.Type.fromCode(rs.getString("operation_type"));
+                LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
 
                 Operation op = new Operation(
                     rs.getLong("id"),
                     rs.getString("account_number"),
                     rs.getString("asset_symbol"),
-                    op_type,
+                    opType,
                     rs.getDouble("quantity"),
                     rs.getDouble("price"),
-                    created_at
+                    createdAt
                 );
 
                 lista.add(op);
