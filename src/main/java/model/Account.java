@@ -34,7 +34,10 @@ public abstract class Account {
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getPasswordHash() { return passwordHash; }
-    public double getBalance() { return balance; }
+    public double getBalance() {
+        AccountDAO dao = new AccountDAO();
+        return dao.getBalance(accountNumber);
+    }
 
     public void deposit(double amount) {
         balance += amount;

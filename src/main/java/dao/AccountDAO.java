@@ -112,11 +112,31 @@ public class AccountDAO {
 
             ps.setDouble(1, balance);
             ps.setString(2, accountNumber);
-            ps.executeUpdate();
+            ps.executeQuery();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public double getBalance(String accountNumber) {
+        String sql = "SELECT acc_balance FROM account WHERE acc_number = ?";
+        double balance = 0.00;
+
+        try(Connection con = ConnectionFactory.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, accountNumber);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                balance = rs.getDouble("acc_balance");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return balance;
     }
 
     public static Account mapAccount(ResultSet rs) throws SQLException {
