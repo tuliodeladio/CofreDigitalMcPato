@@ -1,8 +1,8 @@
 --------------------------------------------------
 -- INSERT ACCOUNT
 --------------------------------------------------
-INSERT INTO account VALUES ('0000000001','João Silva','joao@email.com','hash123',1000,'f','12345678900');
-INSERT INTO account VALUES ('0000000002','Empresa XP','empresa@email.com','hash456',5000,'j','12345678000100');
+INSERT INTO account VALUES ('0000000001','João Silva','joao@email.com','hash123',1000,'F','12345678900');
+INSERT INTO account VALUES ('0000000002','Empresa XP','empresa@email.com','hash456',5000,'E','12345678000100');
 
 --------------------------------------------------
 -- INSERT ASSET

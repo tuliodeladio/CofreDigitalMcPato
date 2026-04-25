@@ -1,91 +1,93 @@
 package service;
 
+import dao.TransferDAO;
 import model.Account;
-import model.Transfer;
+import model.AccountAsset;
+import record.Transfer;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class TransferService {
-
-    private static Map<String, List<Transfer>> transferenciasPorConta = new HashMap<>();
-
-    public Transfer withdraw(Account contaOrigem, double valor) {
+    public void withdraw(Account contaOrigem, double valor) {
         if (!contaOrigem.withdraw(valor)) {
-            return null;
+            System.out.println("Saldo insuficiente!");
+            return;
         }
 
-        Transfer transferencia = new Transfer(
-                System.currentTimeMillis(),
-                contaOrigem.getAccountNumber(),
-                null,
-                null,
-                null,
-                valor,
-                "SAQUE",
-                LocalDateTime.now()
+        adicionarTransferencia(
+            contaOrigem.getAccountNumber(),
+            null,
+            null,
+            0.00,
+            valor,
+            Transfer.Type.WITHDRAW
         );
 
-        adicionarTransferencia(contaOrigem.getAccountNumber(), transferencia);
-        return transferencia;
+        System.out.println("Saque efetuado!");
     }
 
-    public Transfer deposit(Account contaDestino, double valor) {
+    public void deposit(Account contaDestino, double valor) {
         if (valor <= 0) {
-            return null;
+            System.out.println("Insira um valor válido!");
+            return;
         }
 
         contaDestino.deposit(valor);
 
-        Transfer transferencia = new Transfer(
-                System.currentTimeMillis(),
-                null,
-                contaDestino.getAccountNumber(),
-                null,
-                null,
-                valor,
-                "DEPOSITO",
-                LocalDateTime.now()
+        adicionarTransferencia(
+            null,
+            contaDestino.getAccountNumber(),
+            null,
+            0.00,
+            valor,
+            Transfer.Type.DEPOSIT
         );
-
-        adicionarTransferencia(contaDestino.getAccountNumber(), transferencia);
-        return transferencia;
+        System.out.println("Depósito realizado!");
     }
 
-    public Transfer transfer(Account contaOrigem, Account contaDestino,
-                             String symbol, double quantity) {
+    public void transfer(Account contaOrigem, Account contaDestino, AccountAsset asset, double quantity) {
+        String assetSymbol = asset.getAssetSymbol();
+        double qtdOrigem = asset.getQuantity();
 
-        double qtdOrigem = contaOrigem.getAsset(symbol);
         if (qtdOrigem < quantity) {
-            return null;
+            System.out.println("A conta não possui ativos suficientes para esta transferência!");
+            return;
         }
 
-        contaOrigem.removeAsset(symbol, quantity);
-        contaDestino.addAsset(symbol, quantity);
+        contaOrigem.removeAsset(assetSymbol, quantity);
+        contaDestino.addAsset(assetSymbol, quantity);
 
-        Transfer transferencia = new Transfer(
-                System.currentTimeMillis(),
-                contaOrigem.getAccountNumber(),
-                contaDestino.getAccountNumber(),
-                symbol,
-                quantity,
-                null,
-                "TRANSFER_ATIVO",
-                LocalDateTime.now()
+        adicionarTransferencia(
+            contaOrigem.getAccountNumber(),
+            contaDestino.getAccountNumber(),
+            assetSymbol,
+            quantity,
+            0.00,
+            Transfer.Type.ASSET_TRANSFER
         );
 
-        adicionarTransferencia(contaOrigem.getAccountNumber(), transferencia);
-        adicionarTransferencia(contaDestino.getAccountNumber(), transferencia);
-        return transferencia;
+        System.out.println("Transferência realizada!");
     }
 
     public List<Transfer> listByUser(String accountNumber) {
-        return transferenciasPorConta.getOrDefault(accountNumber, new ArrayList<>());
+        TransferDAO dao = new TransferDAO();
+        return dao.listByAccount(accountNumber);
     }
 
-    private void adicionarTransferencia(String accountNumber, Transfer transferencia) {
-        transferenciasPorConta
-                .computeIfAbsent(accountNumber, k -> new ArrayList<>())
-                .add(transferencia);
+    private void adicionarTransferencia(String fromAccount, String toAccount, String symbol, Double quantity, Double amount, Transfer.Type transferType) {
+        Transfer transfer = new Transfer(
+            System.currentTimeMillis(),
+            fromAccount,
+            toAccount,
+            symbol,
+            quantity,
+            amount,
+            transferType,
+            LocalDateTime.now()
+        );
+
+        TransferDAO dao = new TransferDAO();
+        dao.insert(transfer);
     }
 }

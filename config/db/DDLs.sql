@@ -9,7 +9,7 @@ CREATE TABLE account (
     acc_document_number CHAR(14) NOT NULL
 );
 
-COMMENT ON COLUMN account.acc_type IS 'Type pode ser F de Pessoa Física ou J de Pessoa Jurídica.';
+COMMENT ON COLUMN account.acc_type IS 'Type pode ser F de Pessoa Física ou E de Empresa.';
 COMMENT ON COLUMN account.acc_document_number IS 'Document Number pode ser CPF ou CNPJ';
 
 -- ADICIONA CONSTRAINTS À TABELA ACCOUNT
@@ -22,7 +22,7 @@ ALTER TABLE account ADD CONSTRAINT un_account_pwd_hash UNIQUE (acc_password_hash
 ALTER TABLE account ADD CONSTRAINT un_account_document_number UNIQUE (acc_document_number);
 
 -- ADICIONA CONSTRAINT CHECKS
-ALTER TABLE account ADD CONSTRAINT ck_account_type CHECK (LOWER(acc_type) IN ('f', 'j'));
+ALTER TABLE account ADD CONSTRAINT ck_account_type CHECK (UPPER(acc_type) IN ('F', 'E'));
 
 
 
@@ -54,16 +54,20 @@ CREATE TABLE account_asset (
 ALTER TABLE account_asset ADD CONSTRAINT fk_account_asset_account_number FOREIGN KEY (account_number) REFERENCES account (acc_number) ON DELETE CASCADE;
 ALTER TABLE account_asset ADD CONSTRAINT fk_account_asset_asset_symbol FOREIGN KEY (asset_symbol) REFERENCES asset (asset_symbol) ON DELETE SET NULL;
 
+-- ADICIONA CONSTRAINTS DE UNICIDADE
+ALTER TABLE account_asset ADD CONSTRAINT un_account_asset_acc_number_asset_sym UNIQUE (account_number, asset_symbol);
+
 
 -- CRIA TABELA TRANSFER
 CREATE TABLE transfer (
     id NUMBER(19, 0) NOT NULL,
-    from_account CHAR(10) NOT NULL,
-    to_account CHAR(10) NOT NULL,
-    asset_symbol VARCHAR(10) NOT NULL,
+    from_account CHAR(10),
+    to_account CHAR(10),
+    asset_symbol VARCHAR(10),
     quantity DECIMAL(18,6) DEFAULT 0,
     transfer_value DECIMAL(15,2) DEFAULT 0,
-    transfer_type VARCHAR(20)
+    transfer_type VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMENT ON COLUMN transfer.quantity IS 'quantity SE REFERE À QUANTIDADE DE COTAS';
