@@ -32,11 +32,6 @@ INSERT INTO transfer VALUES (1,'0000000001','0000000002','BTC',0.1,10000,'transf
 UPDATE account SET acc_balance = 2000 WHERE acc_number = '0000000001';
 
 --------------------------------------------------
--- DELETE
---------------------------------------------------
-DELETE FROM account_asset WHERE account_number = '0000000001' AND asset_symbol='BTC';
-
---------------------------------------------------
 -- SELECT
 --------------------------------------------------
 SELECT * FROM account;

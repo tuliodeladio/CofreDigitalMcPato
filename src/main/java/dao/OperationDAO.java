@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OperationDAO {
-    public void insert(Operation operation) {
-        String sql = "INSERT INTO operation VALUES (?,?,?,?,?,?,?)";
 
-        try(Connection con = ConnectionFactory.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+    public void insert(Operation operation) {
+        String sql = "INSERT INTO operation (id, account_number, asset_symbol, operation_type, quantity, price, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = ConnectionFactory.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setLong(1, operation.id());
             ps.setString(2, operation.accountNumber());
@@ -34,12 +35,12 @@ public class OperationDAO {
     public void update(Operation operation) {
         String sql = "UPDATE operation SET account_number = ?, asset_symbol = ?, operation_type = ?, quantity = ?, price = ? WHERE id = ?";
 
-        try(Connection con = ConnectionFactory.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConnectionFactory.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, operation.accountNumber());
-            ps.setString(2, operation.symbol ());
-            ps.setString(3, operation.type().toString());
+            ps.setString(2, operation.symbol());
+            ps.setString(3, operation.getTypeCode());
             ps.setDouble(4, operation.quantity());
             ps.setDouble(5, operation.price());
             ps.setLong(6, operation.id());
@@ -54,11 +55,10 @@ public class OperationDAO {
     public void delete(Operation operation) {
         String sql = "DELETE FROM operation WHERE id = ?";
 
-        try(Connection con = ConnectionFactory.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConnectionFactory.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setLong(1, operation.id());
-
             ps.executeUpdate();
 
         } catch (Exception e) {
@@ -70,8 +70,8 @@ public class OperationDAO {
         List<Operation> lista = new ArrayList<>();
         String sql = "SELECT * FROM operation WHERE account_number = ?";
 
-        try(Connection con = ConnectionFactory.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConnectionFactory.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, accountNumber);
 
@@ -79,13 +79,13 @@ public class OperationDAO {
 
             while (rs.next()) {
                 Operation op = new Operation(
-                    rs.getLong("id"),
-                    rs.getString("account_number"),
-                    rs.getString("asset_symbol"),
-                    Operation.Type.fromCode(rs.getString("operation_type")),
-                    rs.getDouble("quantity"),
-                    rs.getDouble("price"),
-                    rs.getTimestamp("created_at").toLocalDateTime()
+                        rs.getLong("id"),
+                        rs.getString("account_number"),
+                        rs.getString("asset_symbol"),
+                        Operation.Type.fromCode(rs.getString("operation_type")),
+                        rs.getDouble("quantity"),
+                        rs.getDouble("price"),
+                        rs.getTimestamp("created_at").toLocalDateTime()
                 );
 
                 lista.add(op);

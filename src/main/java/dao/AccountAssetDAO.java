@@ -14,8 +14,8 @@ public class AccountAssetDAO {
     public void insert(AccountAsset accountAsset) {
         String sql = "INSERT INTO account_asset VALUES (?,?,?)";
 
-        try(Connection con = ConnectionFactory.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConnectionFactory.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, accountAsset.getAccountNumber());
             ps.setString(2, accountAsset.getAssetSymbol());
@@ -31,8 +31,8 @@ public class AccountAssetDAO {
     public void update(AccountAsset accountAsset) {
         String sql = "UPDATE account_asset SET quantity = ? WHERE account_number = ? AND asset_symbol = ?";
 
-        try(Connection con = ConnectionFactory.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConnectionFactory.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setDouble(1, accountAsset.getQuantity());
             ps.setString(2, accountAsset.getAccountNumber());
@@ -48,8 +48,8 @@ public class AccountAssetDAO {
     public void delete(AccountAsset accountAsset) {
         String sql = "DELETE FROM account_asset WHERE account_number = ? AND asset_symbol = ?";
 
-        try(Connection con = ConnectionFactory.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConnectionFactory.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, accountAsset.getAccountNumber());
             ps.setString(2, accountAsset.getAssetSymbol());
@@ -63,32 +63,28 @@ public class AccountAssetDAO {
 
     public AccountAsset findAccountAsset(String accountNumber, String assetSymbol) {
         String sql = "SELECT * FROM account_asset WHERE account_number = ? AND asset_symbol = ?";
-        AccountAsset accountAsset = null;
 
-        try(Connection con = ConnectionFactory.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConnectionFactory.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, accountNumber);
             ps.setString(2, assetSymbol);
 
-            ps.executeUpdate();
-            ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();  // ← ERRO: tinha ps.executeUpdate() antes
 
             if (rs.next()) {
-                accountAsset = new AccountAsset(
-                    rs.getString("account_number"),
-                    rs.getString("asset_symbol"),
-                    rs.getDouble("quantity")
+                return new AccountAsset(
+                        rs.getString("account_number"),
+                        rs.getString("asset_symbol"),
+                        rs.getDouble("quantity")
                 );
             }
-
-            return accountAsset;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return accountAsset;
+        return null;  // ← Retorna null diretamente, não accountAsset
     }
 
     public List<AccountAsset> listAllByAccount(String accountNumber) {
@@ -96,17 +92,17 @@ public class AccountAssetDAO {
 
         String sql = "SELECT * FROM account_asset WHERE account_number = ?";
 
-        try(Connection con = ConnectionFactory.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConnectionFactory.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, accountNumber);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 AccountAsset accountAsset = new AccountAsset(
-                    rs.getString("account_number"),
-                    rs.getString("asset_symbol"),
-                    rs.getDouble("quantity")
+                        rs.getString("account_number"),
+                        rs.getString("asset_symbol"),
+                        rs.getDouble("quantity")
                 );
 
                 lista.add(accountAsset);

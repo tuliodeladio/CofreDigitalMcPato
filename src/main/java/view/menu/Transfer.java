@@ -63,7 +63,7 @@ public class Transfer {
         for (Account acc : allAccounts) {
             if (!acc.getAccountNumber().equals(currentUserAccountNumber)) {
                 System.out.println("Nome: " + acc.getName()
-                    + " | Conta: " + acc.getAccountNumber());
+                        + " | Conta: " + acc.getAccountNumber());
             }
         }
 
@@ -73,8 +73,8 @@ public class Transfer {
             Account contaDestinoObj = allAccounts.stream().filter(a -> a.getAccountNumber().trim().equals(contaDest)).findFirst().orElse(null);
 
             if (contaDestinoObj == null ||
-                contaDestinoObj.getAccountNumber()
-                    .equals(currentUserAccountNumber)) {
+                    contaDestinoObj.getAccountNumber()
+                            .equals(currentUserAccountNumber)) {
                 System.out.println("Conta de destino não encontrada ou inválida!");
                 return;
             }
@@ -84,7 +84,8 @@ public class Transfer {
             List<AccountAsset> accountAssets = accountAssetDao.listAllByAccount(currentUserAccountNumber);
 
             for (AccountAsset asset : accountAssets) {
-                System.out.println(asset.getAssetSymbol() + " - " + asset.getAssetName() + " - " + asset.getQuantity());
+                // ← ERRO: removido getAssetName(), só usa getAssetSymbol() e getQuantity()
+                System.out.println(asset.getAssetSymbol() + " - Quantidade: " + asset.getQuantity());
             }
 
             System.out.print("Escolha o ativo: ");

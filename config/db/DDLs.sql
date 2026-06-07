@@ -114,8 +114,8 @@ ALTER TABLE operation ADD CONSTRAINT ck_operation_type CHECK (LOWER(operation_ty
 
 
 -- REMOVE AS TABELAS ACIMA
-DROP TABLE account CASCADE CONSTRAINTS;
-DROP TABLE asset CASCADE CONSTRAINTS;
-DROP TABLE account_asset;
-DROP TABLE transfer;
-DROP TABLE operation;
+--DROP TABLE account CASCADE CONSTRAINTS;
+--DROP TABLE asset CASCADE CONSTRAINTS;
+--DROP TABLE account_asset;
+--DROP TABLE transfer;
+--DROP TABLE operation;
